@@ -28,7 +28,7 @@ ToDo:
        
 """
 from __future__ import annotations
-from collections.abc import Hashable, Mapping, MutableMapping, Sequence
+from collections.abc import Hashable, Iterator, Mapping, MutableMapping, Sequence
 import copy
 import dataclasses
 import inspect
@@ -287,7 +287,7 @@ class Catalog(Dictionary):
     """
     contents: Mapping[Hashable, Any] = dataclasses.field(
         default_factory = dict)
-    default_factory: Any = None
+    default_factory: Optional[Any] = None
     default: Optional[Any] = 'all'
     always_return_list: bool = False
 
@@ -313,14 +313,19 @@ class Catalog(Dictionary):
             return list(self.contents.values())
         # Returns a list of values for keys listed in 'default' attribute.
         elif key in _DEFAULT_KEYS:
-            try:
-                return[self.default]
-            except KeyError:
-                matches = {k: self.contents[k] for k in self.default}
-                return list(matches.values())
+            return self[self.default]
         # Returns an empty list if a null value is sought.
         elif key in _NONE_KEYS:
-            return []
+            if self.default_factory is None:
+                if self.always_return_list:
+                    return []
+                else:
+                    return None
+            else:
+                try:
+                    return self.default_factory()
+                except TypeError:
+                    return self.default_factory
         # Returns list of matching values if 'key' is list-like.        
         elif isinstance(key, Sequence) and not isinstance(key, str):
             return [self.contents[k] for k in key if k in self.contents]
@@ -347,13 +352,10 @@ class Catalog(Dictionary):
                 in 'contents'.
 
         """
-        if key in _DEFAULT_KEYS:
-            self.default = utilities.iterify(item = value)
-        else:
-            try:
-                self.contents[key] = value
-            except TypeError:
-                self.contents.update(dict(zip(key, value))) # type: ignore
+        try:
+            self.contents[key] = value
+        except TypeError:
+            self.contents.update(dict(zip(key, value))) # type: ignore
         return
 
     def __delitem__(self, key: Union[Hashable, Sequence[Hashable]]) -> None:
@@ -364,9 +366,12 @@ class Catalog(Dictionary):
                 'contents' to delete the key/value pair.
 
         """
-        self.contents = {
-            i: self.contents[i] for i in self.contents 
-            if i not in utilities.iterify(item = key)}
+        keys = list(utilities.iterify(item = key))
+        if all(k in self for k in keys):
+            self.contents = {
+                i: self.contents[i] for i in self.contents if i not in keys}
+        else:
+            raise KeyError(f'{key} not found in the Catalog')
         return
 
 
@@ -387,8 +392,8 @@ class Library(MutableMapping):
              inheriting from ChainMap.
                  
     """
-    classes: Catalog = dataclasses.field(default_factory = Catalog)
-    instances: Catalog = dataclasses.field(default_factory = Catalog)
+    classes: Catalog = dataclasses.field(default_factory = dict)
+    instances: Catalog = dataclasses.field(default_factory = dict)
         
     """ Public Methods """
     
@@ -526,4 +531,24 @@ class Library(MutableMapping):
         """
         self.remove(item = key)
         return
+
+    def __iter__(self) -> Iterator[Any]:
+        """Returns iterable of 'contents'.
+
+        Returns:
+            Iterator: of 'contents'.
+
+        """
+        combined = copy.deepcopy(self.instances)
+        return iter(combined.update(self.classes))
+
+    def __len__(self) -> int:
+        """Returns length of 'contents'.
+
+        Returns:
+            int: length of 'contents'.
+
+        """
+        combined = copy.deepcopy(self.instances)
+        return len(combined.update(self.classes))
     

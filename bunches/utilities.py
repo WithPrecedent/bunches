@@ -25,6 +25,7 @@ ToDo:
 from __future__ import annotations
 
 from collections.abc import Iterable, Iterable
+import inspect
 import re
 from typing import Any, Optional
 
@@ -77,16 +78,16 @@ def get_name(item: Any, default: Optional[str] = None) -> Optional[str]:
     """        
     if isinstance(item, str):
         return item
+    elif (
+        hasattr(item, 'name') 
+        and not inspect.isclass(item)
+        and isinstance(item.name, str)):
+        return item.name
     else:
-        if hasattr(item, 'name') and isinstance(item.name, str):
-            return item.name
-        else:
-            try:
-                return snakify(item.__name__) # type: ignore
-            except AttributeError:
-                if item.__class__.__name__ is not None:
-                    return snakify( # type: ignore
-                        item.__class__.__name__) 
-                else:
-                    return default
-    
+        try:
+            return snakify(item.__name__)
+        except AttributeError:
+            if item.__class__.__name__ is not None:
+                return snakify(item.__class__.__name__) 
+            else:
+                return default
