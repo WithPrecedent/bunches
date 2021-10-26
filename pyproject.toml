@@ -3,6 +3,10 @@ name = "bunches"
 version = "0.1.0"
 description = "flexible, extensible python data structures"
 authors = ["Corey Rayburn Yung <coreyrayburnyung@gmail.com>"]
+license = "Apache"
+readme = "README.md"
+homepage = "https://github.com/WithPrecedent/bunches"
+repository = "https://github.com/WithPrecedent/bunches"
 
 [tool.poetry.dependencies]
 python = "^3.9"
