@@ -1,7 +1,7 @@
 """
 mappings: extensible, flexible, lightweight dict-like classes
 Corey Rayburn Yung <coreyrayburnyung@gmail.com>
-Copyright 2021, Corey Rayburn Yung
+Copyright 2020-2022, Corey Rayburn Yung
 License: Apache-2.0
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,25 +17,28 @@ License: Apache-2.0
     limitations under the License.
 
 Contents:
-    Dictionary (Bunch, MutableMapping): bunches's drop-in replacement for a 
-        python dict with some added functionality.
+    Dictionary (bunches,Bunch, MutableMapping): bunches's drop-in replacement 
+        for a python dict with some added functionality.
     Catalog (Dictionary): wildcard-accepting dict which is primarily intended 
         for storing different options and strategies. It also returns lists of 
         matches if a list of keys is provided.
- 
+    Library (MutableMapping): a chained mapping used for registering subclasses
+        and instances.
+        
 ToDo:
 
        
 """
 from __future__ import annotations
-from collections.abc import Hashable, Iterator, Mapping, MutableMapping, Sequence
+from collections.abc import (
+    Hashable, Iterator, Mapping, MutableMapping, Sequence)
 import copy
 import dataclasses
 import inspect
 from typing import Any, Optional, Type, Union
 
-from . import base
-from . import utilities
+from . import bases
+from ..change import convert
                   
 
 _ALL_KEYS: list[Any] = ['all', 'All', ['all'], ['All']]
@@ -47,22 +50,21 @@ _NONE_KEYS: list[Any] = ['none', 'None', ['none'], ['None']]
 
 @dataclasses.dataclass  # type: ignore
 class Dictionary(base.Bunch, MutableMapping):  # type: ignore
-    """Basic bunches dict replacement.
+    """Basic amos dict replacement.
     
     A Dictionary differs from an ordinary python dict in ways inherited from 
     Bunch by requiring 'add' and 'subset' methods, storing data in 'contents', 
     and allowing the '+' operator to join Dictionary instances with other 
     mappings, including Dictionary instances. 
     
-    # In addition, it differs in 1 other significant way:
-    #     1) When returning 'keys', 'values' and 'items', this class returns them
-    #         as tuples instead of KeysView, ValuesView, and ItemsView.
+    In addition, it differs in 1 other significant way:
+        1) When returning 'keys', 'values' and 'items', this class returns them
+            as tuples instead of KeysView, ValuesView, and ItemsView.
     
     Args:
         contents (MutableMapping[Hashable, Any]): stored dictionary. Defaults 
             to an empty dict.
         default_factory (Optional[Any]): default value to return or default 
-            function to call when the 'get' method is used. Defaults to None. 
                           
     """
     contents: MutableMapping[Hashable, Any] = dataclasses.field(
@@ -83,6 +85,16 @@ class Dictionary(base.Bunch, MutableMapping):  # type: ignore
         self.contents.update(item, **kwargs)
         return
 
+    def delete(self, item: Hashable) -> None:
+        """Deletes 'item' in 'contents'.
+
+        Args:
+            item (Hashable): key in 'contents' to delete the key/value pair.
+
+        """
+        del self.contents[item]
+        return
+    
     @classmethod
     def fromkeys(
         cls, 
@@ -131,23 +143,23 @@ class Dictionary(base.Bunch, MutableMapping):  # type: ignore
             else:
                 return default
                 
-    # def items(self) -> tuple[tuple[Hashable, Any], ...]: # type: ignore
-    #     """Emulates python dict 'items' method.
+    def items(self) -> tuple[tuple[Hashable, Any], ...]: # type: ignore
+        """Emulates python dict 'items' method.
         
-    #     Returns:
-    #         tuple[tuple[Hashable], Any]: a tuple equivalent to dict.items(). 
+        Returns:
+            tuple[tuple[Hashable], Any]: a tuple equivalent to dict.items(). 
             
-    #     """
-    #     return tuple(zip(self.keys(), self.values()))
+        """
+        return tuple(zip(self.keys(), self.values()))
 
-    # def keys(self) -> tuple[Hashable, ...]: # type: ignore
-    #     """Returns 'contents' keys as a tuple.
+    def keys(self) -> tuple[Hashable, ...]: # type: ignore
+        """Returns 'contents' keys as a tuple.
         
-    #     Returns:
-    #         tuple[Hashable, ...]: a tuple equivalent to dict.keys().
+        Returns:
+            tuple[Hashable, ...]: a tuple equivalent to dict.keys().
             
-    #     """
-    #     return tuple(self.contents.keys())
+        """
+        return tuple(self.contents.keys())
 
     def setdefault(self, value: Any) -> None: # type: ignore
         """sets default value to return when 'get' method is used.
@@ -168,8 +180,8 @@ class Dictionary(base.Bunch, MutableMapping):  # type: ignore
         """Returns a new instance with a subset of 'contents'.
 
         This method applies 'include' before 'exclude' if both are passed. If
-        'include' is None, all existing keys will be added before 'exclude' is
-        applied.
+        'include' is None, all existing items will be added to the new subset
+        class instance before 'exclude' is applied.
         
         Args:
             include (Optional[Union[Hashable, Sequence[Hashable]]]): key(s) to 
@@ -188,12 +200,12 @@ class Dictionary(base.Bunch, MutableMapping):  # type: ignore
             raise ValueError('include or exclude must not be None')
         else:
             if include is None:
-                contents = self.contents
+                contents = copy.deepcopy(self.contents)
             else:
-                include = list(utilities.iterify(item = include)) 
+                include = list(convert.iterify(item = include)) 
                 contents = {k: self.contents[k] for k in include}
             if exclude is not None:
-                exclude = list(utilities.iterify(item = exclude))
+                exclude = list(convert.iterify(item = exclude))
                 contents = {
                     k: v for k, v in contents.items() 
                     if k not in exclude}
@@ -201,14 +213,14 @@ class Dictionary(base.Bunch, MutableMapping):  # type: ignore
             new_dictionary.contents = contents
         return new_dictionary
       
-    # def values(self) -> tuple[Any, ...]: # type: ignore
-    #     """Returns 'contents' values as a tuple.
+    def values(self) -> tuple[Any, ...]: # type: ignore
+        """Returns 'contents' values as a tuple.
         
-    #     Returns:
-    #         tuple[Any, ...]: a tuple equivalent to dict.values().
+        Returns:
+            tuple[Any, ...]: a tuple equivalent to dict.values().
             
-    #     """
-    #     return tuple(self.contents.values())
+        """
+        return tuple(self.contents.values())
 
     """ Dunder Methods """
 
@@ -233,16 +245,6 @@ class Dictionary(base.Bunch, MutableMapping):  # type: ignore
 
         """
         self.contents[key] = value
-        return
-
-    def __delitem__(self, key: Hashable) -> None:
-        """Deletes 'key' in 'contents'.
-
-        Args:
-            key (Hashable): key in 'contents' to delete the key/value pair.
-
-        """
-        del self.contents[key]
         return
 
 
@@ -276,7 +278,7 @@ class Catalog(Dictionary):
             empty dict.
         default_factory (Any): default value to return when the 'get' method is 
             used.
-        default (Sequence[Any]]): a list of keys in 'contents' which will be 
+        default (Optional[Any]]): a list of keys in 'contents' which will be 
             used to return items when 'default' is sought. If not passed, 
             'default' will be set to all keys.
         always_return_list (bool): whether to return a list even when the key 
@@ -291,6 +293,24 @@ class Catalog(Dictionary):
     default: Optional[Any] = 'all'
     always_return_list: bool = False
 
+    """ Public Methods """
+    
+    def delete(self, item: Union[Hashable, Sequence[Hashable]]) -> None:
+        """Deletes 'item' in 'contents'.
+
+        Args:
+            item: (Union[Hashable, Sequence[Hashable]]): name(s) of key(s) in 
+                'contents' to delete the key/value pair.
+
+        """
+        keys = list(convert.iterify(item = item))
+        if all(k in self for k in keys):
+            self.contents = {
+                i: self.contents[i] for i in self.contents if i not in keys}
+        else:
+            raise KeyError(f'{item} not found in the Catalog')
+        return
+    
     """ Dunder Methods """
 
     def __getitem__(
@@ -358,26 +378,10 @@ class Catalog(Dictionary):
             self.contents.update(dict(zip(key, value))) # type: ignore
         return
 
-    def __delitem__(self, key: Union[Hashable, Sequence[Hashable]]) -> None:
-        """Deletes 'key' in 'contents'.
-
-        Args:
-            key (Union[Hashable, Sequence[Hashable]]): name(s) of key(s) in 
-                'contents' to delete the key/value pair.
-
-        """
-        keys = list(utilities.iterify(item = key))
-        if all(k in self for k in keys):
-            self.contents = {
-                i: self.contents[i] for i in self.contents if i not in keys}
-        else:
-            raise KeyError(f'{key} not found in the Catalog')
-        return
-
 
 @dataclasses.dataclass  # type: ignore
 class Library(MutableMapping):
-    """Stores classes and class instances.
+    """Stores classes instances and classes in a chained mapping.
     
     When searching for matches, instances are prioritized over classes.
     
@@ -386,14 +390,12 @@ class Library(MutableMapping):
             Catalog.
         instances (Catalog): a catalog of stored class instances. Defaults to an
             empty Catalog.
-    
-    Attributes:
-        maps (list[Catalog]): the ordered mappings to search, as required from
-             inheriting from ChainMap.
                  
     """
-    classes: Catalog = dataclasses.field(default_factory = dict)
-    instances: Catalog = dataclasses.field(default_factory = dict)
+    classes: Catalog[str, Type[Any]] = dataclasses.field(
+        default_factory = Catalog)
+    instances: Catalog[str, object] = dataclasses.field(
+        default_factory = Catalog)
         
     """ Public Methods """
     
@@ -404,26 +406,31 @@ class Library(MutableMapping):
         """Adds 'item' to 'classes' and/or 'instances'.
 
         If 'item' is a class, it is added to 'classes.' If it is an object, it
-        is added to 'instances' and its class is added to 'classes'.
+        is added to 'instances' and its class is added to 'classes'. The key
+        used to store instances and classes are different if the instance has
+        a 'name' attribute (which is used as the key for the instance).
         
         Args:
-            item (Union[Type, object]): class or instance to add to the Library
-                instance.
+            item (Union[Type[Any], object]): class or instance to add to the 
+                Library instance.
             name (Optional[Hashable]): key to use to store 'item'. If not
-                passed, a key will be created using the 'get_name' method.
+                passed, a key will be created using the 'namify' method.
+                Defaults to None
                 
         """
-        key = name or utilities.get_name(item = item)
+        key = name or convert.namify(item = item)
         if inspect.isclass(item):
             self.classes[key] = item
         elif isinstance(item, object):
-            self.instances[key] = item
+            self.instances[key] = copy.deepcopy(item)
+            # Key for the class will be different because it is inferred from
+            # the class and not any attributes.
             self.deposit(item = item.__class__)
         else:
             raise TypeError(f'item must be a class or a class instance')
         return
     
-    def remove(self, item: Hashable) -> None:
+    def delete(self, item: Hashable) -> None:
         """Removes an item from 'instances' or 'classes.'
         
         If 'item' is found in 'instances', it will not also be removed from 
@@ -448,33 +455,35 @@ class Library(MutableMapping):
     def withdraw(
         self, 
         item: Union[Hashable, Sequence[Hashable]], 
-        kwargs: Optional[MutableMapping[Hashable, Any]] = None) -> (
+        parameters: Optional[MutableMapping[Hashable, Any]] = None) -> (
             Union[Type[Any], object]):
         """Returns instance or class of first match of 'item' from catalogs.
         
         The method prioritizes the 'instances' catalog over 'classes' and any
         passed names in the order they are listed.
         
+        An instance will be returned so long as 'parameters' is not None. 
+        
         Args:
             item (Union[Hashable, Sequence[Hashable]]): key name(s) of stored 
                 item(s) sought.
-            kwargs (Optional[MutableMapping[Hashable, Any]]]): keyword arguments 
-                to pass to a newly created instance or, if the stored item is 
-                already an instance to be manually added as attributes. If not
-                passed, the found item will be returned unaltered. Defaults to
-                None.
+            parameters (Optional[MutableMapping[Hashable, Any]]]): keyword 
+                arguments to pass to a newly created instance or, if the stored 
+                item is already an instance to be manually added as attributes. 
+                If not passed, the found item will be returned unaltered. 
+                Defaults to None.
             
         Raises:
             KeyError: if 'item' does not match a key to a stored item in either
                 'instances' or 'classes'.
             
         Returns:
-            Union[Type[Any], object]: returns a class or instance if 'kwargs' 
+            Union[Type[Any], object]: returns a class or instance if 'parameters' 
                 are None, depending upon with Catalog the matching item is 
-                found. If 'kwargs' are passed, an instance is always returned.
+                found. If 'parameters' are passed, an instance is always returned.
             
         """
-        items = utilities.iterify(item)
+        items = list(convert.iterify(item))
         item = None
         for key in items:
             for catalog in ['instances', 'classes']:
@@ -487,14 +496,17 @@ class Library(MutableMapping):
                 break
         if item is None:
             raise KeyError(f'No matching item for {item} was found')
-        if kwargs is not None:
-            if 'item' in item.__annotations__.keys() and 'item' not in kwargs:
-                kwargs[item] = items[0]
+        if parameters is not None:
+            if ('name' in item.__annotations__.keys() 
+                    and 'name' not in parameters):
+                parameters['name'] = items[0]
             if inspect.isclass(item):
-                item = item(**kwargs)
+                return item(**parameters)
             else:
-                for key, value in kwargs.items():
-                    setattr(item, key, value)  
+                instance = copy.deepcopy(item)
+                for key, value in parameters.items():
+                    setattr(instance, key, value)
+                return instance
         return item # type: ignore
     
     """ Dunder Methods """
@@ -520,16 +532,6 @@ class Library(MutableMapping):
 
         """
         self.deposit(item = value, name = key)
-        return
-
-    def __delitem__(self, key: Hashable) -> None:
-        """Deletes 'key' in 'contents'.
-
-        Args:
-            key (Hashable): key in 'contents' to delete the key/value pair.
-
-        """
-        self.remove(item = key)
         return
 
     def __iter__(self) -> Iterator[Any]:

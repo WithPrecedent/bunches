@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bunches"
-version = "0.1.0"
+version = "0.1.1"
 description = "flexible, extensible python data structures"
 authors = ["Corey Rayburn Yung <coreyrayburnyung@gmail.com>"]
 license = "Apache"
