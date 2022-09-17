@@ -1,5 +1,5 @@
 """
-traits: characteristics of amos graphs
+traits: characteristics of graphs
 Corey Rayburn Yung <coreyrayburnyung@gmail.com>
 Copyright 2020-2022, Corey Rayburn Yung
 License: Apache-2.0
@@ -17,7 +17,7 @@ License: Apache-2.0
     limitations under the License.
 
 Contents:
-    Directed (Adjacency): a directed graph with unweighted edges.
+    Directed (ABC): a directed graph with unweighted edges.
         
 To Do:
     Complete Network which will use an adjacency matrix for internal storage.
@@ -25,15 +25,12 @@ To Do:
 """
 from __future__ import annotations
 import abc
-from collections.abc import (
-    Collection, Hashable, MutableMapping, MutableSequence, Sequence, Set)
 import dataclasses
 from typing import Any, Optional, Type, TYPE_CHECKING, Union
 
-from . import composites
-from . import hybrids
-
 if TYPE_CHECKING:
+    from . import composites
+    from . import hybrids
     from . import trees
     
     

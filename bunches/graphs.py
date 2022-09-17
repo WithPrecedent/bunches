@@ -33,21 +33,17 @@ import dataclasses
 import itertools
 from typing import Any, Optional, Type, TYPE_CHECKING, Union
 
-from . import core
+from .import check
+from . import composites
+from .import convert
 from . import forms
 from . import hybrids
-from ..containers import mappings
-from ..observe import report
-from ..change import convert
-from ..observe import check
-from ..change import convert
+from . import traits
+from . import trees
 
-if TYPE_CHECKING:
-    from . import trees
     
-
 @dataclasses.dataclass
-class System(forms.Adjacency, Directed):
+class System(forms.Adjacency, traits.Directed):
     """Directed graph with unweighted edges stored as an adjacency list.
     
     Args:
@@ -57,30 +53,30 @@ class System(forms.Adjacency, Directed):
             format.
                   
     """  
-    contents: MutableMapping[core.Node, Set[core.Node]] = (
+    contents: MutableMapping[composites.Node, Set[composites.Node]] = (
         dataclasses.field(
             default_factory = lambda: collections.defaultdict(set)))
     
     """ Properties """
 
     @property
-    def endpoint(self) -> set[core.Node]:
+    def endpoint(self) -> set[composites.Node]:
         """Returns endpoint nodes in the stored graph in a list."""
         return {k for k in self.contents.keys() if not self.contents[k]}
                     
     @property
-    def root(self) -> set[core.Node]:
+    def root(self) -> set[composites.Node]:
         """Returns root nodes in the stored graph in a list."""
         stops = list(itertools.chain.from_iterable(self.contents.values()))
         return {k for k in self.contents.keys() if k not in stops}
                       
     @property
-    def nodes(self) -> set[core.Node]:
+    def nodes(self) -> set[composites.Node]:
         """Returns all stored nodes in a set."""
         return set(self.contents.keys())
 
     @property
-    def paths(self) -> core.Nodes:
+    def paths(self) -> composites.Nodes:
         """Returns all paths through the stored as a list of nodes."""
         return self._find_all_paths(starts = self.root, stops = self.endpoint)
     
@@ -110,7 +106,7 @@ class System(forms.Adjacency, Directed):
     """ Class Methods """
     
     @classmethod
-    def from_nodes(cls, item: core.Nodes) -> System:
+    def from_nodes(cls, item: composites.Nodes) -> System:
         """Creates a System instance from a Nodes."""
         new_contents = convert.pipeline_to_adjacency(item = item)
         return cls(contents = new_contents)
@@ -136,9 +132,9 @@ class System(forms.Adjacency, Directed):
 
     def add(
         self, 
-        node: core.Node,
-        ancestors: core.Nodes = None,
-        descendants: core.Nodes = None) -> None:
+        node: composites.Node,
+        ancestors: composites.Nodes = None,
+        descendants: composites.Nodes = None) -> None:
         """Adds 'node' to the stored graph.
         
         Args:
@@ -182,7 +178,7 @@ class System(forms.Adjacency, Directed):
                     self.connect(start = start, stop = node)                 
         return 
 
-    def append(self, item: core.Composite) -> None:
+    def append(self, item: composites.Composite) -> None:
         """Appends 'item' to the endpoints of the stored graph.
 
         Appending creates an edge between every endpoint of this instance's
@@ -198,7 +194,7 @@ class System(forms.Adjacency, Directed):
                 or composites.Nodes type.
                 
         """
-        if isinstance(item, core.Composite):
+        if isinstance(item, composites.Composite):
             current_endpoints = list(self.endpoint)
             new_graph = self.create(item = item)
             self.merge(item = new_graph)
@@ -209,7 +205,7 @@ class System(forms.Adjacency, Directed):
             raise TypeError('item must be a Node, Nodes, or Composite type')
         return
   
-    def connect(self, start: core.Node, stop: core.Node) -> None:
+    def connect(self, start: composites.Node, stop: composites.Node) -> None:
         """Adds an edge from 'start' to 'stop'.
 
         Args:
@@ -232,7 +228,7 @@ class System(forms.Adjacency, Directed):
             self.contents[start].add(convert.namify(item = stop))
         return
 
-    def delete(self, node: core.Node) -> None:
+    def delete(self, node: composites.Node) -> None:
         """Deletes node from graph.
         
         Args:
@@ -249,7 +245,7 @@ class System(forms.Adjacency, Directed):
         self.contents = {k: v.discard(node) for k, v in self.contents.items()}
         return
 
-    def disconnect(self, start: core.Node, stop: core.Node) -> None:
+    def disconnect(self, start: composites.Node, stop: composites.Node) -> None:
         """Deletes edge from graph.
 
         Args:
@@ -266,7 +262,7 @@ class System(forms.Adjacency, Directed):
             raise KeyError(f'{start} does not exist in the graph')
         return
 
-    def merge(self, item: core.Composite) -> None:
+    def merge(self, item: composites.Composite) -> None:
         """Adds 'item' to this Graph.
 
         This method is roughly equivalent to a dict.update, just adding the
@@ -292,14 +288,14 @@ class System(forms.Adjacency, Directed):
             adjacency = convert.matrix_to_adjacency(item = item)
         elif isinstance(item, (list, tuple, set)):
             adjacency = convert.pipeline_to_adjacency(item = item)
-        elif isinstance(item, core.Node):
+        elif isinstance(item, composites.Node):
             adjacency = {item: set()}
         else:
             raise TypeError('item must be a Node, Nodes, or Composite type')
         self.contents.update(adjacency)
         return
 
-    def prepend(self, item: core.Composite) -> None:
+    def prepend(self, item: composites.Composite) -> None:
         """Prepends 'item' to the roots of the stored graph.
 
         Prepending creates an edge between every endpoint of 'item' and every
@@ -314,7 +310,7 @@ class System(forms.Adjacency, Directed):
                 or composites.Nodes type.
                 
         """
-        if isinstance(item, core.Composite):
+        if isinstance(item, composites.Composite):
             current_roots = list(self.root)
             new_graph = self.create(item = item)
             self.merge(item = new_graph)
@@ -364,8 +360,8 @@ class System(forms.Adjacency, Directed):
     
     def walk(
         self, 
-        start: core.Node,
-        stop: core.Node, 
+        start: composites.Node,
+        stop: composites.Node, 
         path: Optional[hybrids.Pipeline] = None) -> hybrids.Pipeline:
         """Returns all paths in graph from 'start' to 'stop'.
 
@@ -404,8 +400,8 @@ class System(forms.Adjacency, Directed):
 
     def _find_all_paths(
         self, 
-        starts: core.Nodes, 
-        stops: core.Nodes) -> hybrids.Pipeline:
+        starts: composites.Nodes, 
+        stops: composites.Nodes) -> hybrids.Pipeline:
         """Returns all paths between 'starts' and 'stops'.
 
         Args:
@@ -424,7 +420,7 @@ class System(forms.Adjacency, Directed):
             for end in convert.iterify(item = stops):
                 paths = self.walk(start = start, stop = end)
                 if paths:
-                    if all(isinstance(path, core.Node) for path in paths):
+                    if all(isinstance(path, composites.Node) for path in paths):
                         all_paths.append(paths)
                     else:
                         all_paths.extend(paths)

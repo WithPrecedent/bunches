@@ -46,6 +46,7 @@ from typing import Any, ClassVar, Optional, Type, TYPE_CHECKING, Union
 import amos
 
 from . import base
+from . import check
 from . import convert
 
 if TYPE_CHECKING:

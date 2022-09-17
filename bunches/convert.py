@@ -19,12 +19,13 @@ License: Apache-2.0
 All tools should follow one of two forms. For conversion of a known type
 to another type, the function name should be:
     f'{item type}_to_{output type}'
+    
 For a conversion from an unknown type to another type, the function name should
-be:
+be named:
     f'to_{output type}'
      
 Contents:
-    nodify: converts any python object into a virtual Node subclass instance by 
+    to_node: converts any python object into a virtual Node subclass instance by 
         making it hashable, so it can be used in a Composite and pass the 
         'is_node' type check or isinstance(item, Node).
     to_adjacency
@@ -38,6 +39,7 @@ Contents:
     adjacency_to_edges
     to_matrix
     adjacency_to_matrix
+    to_pipeline
     to_tree
     matrix_to_tree  
     
@@ -46,33 +48,29 @@ ToDo:
     
 """
 from __future__ import annotations
-import ast
 import collections
-from collections.abc import (
-    Collection, Hashable, Iterable, Mapping, MutableMapping, MutableSequence, 
-    Sequence, Set)
-import datetime
+from collections.abc import Collection
+import functools
 import inspect
-import pathlib
-from typing import Any, Callable, Optional, Type, TYPE_CHECKING, Union
+from typing import Any, Type, TYPE_CHECKING, Union
 
+import amos
 import more_itertools
 
-from . import modify
-from ..observe import check
+from . import check
 
 if TYPE_CHECKING:
     from . import composites
-    from ..composites import graphs
-    from ..composites import hybrids
-    from ..containers import sequences
-    from ..composites import trees
+    from . import graphs
+    from . import hybrids
+    from . import trees
     
+    
+""" Converters to Node """
 
-""" Composite Converters """
-
-
-def nodify(item: Union[Type[Any], object]) -> Union[Type[Node], Node]:
+def to_node(
+    item: Union[Type[Any], object]) -> Union[
+        Type[composites.Node], composites.Node]:
     """Converts a class or object into a Node for a composite data structure.
     
     Currently, the method supports any object but only python dataclass types 
@@ -84,7 +82,7 @@ def nodify(item: Union[Type[Any], object]) -> Union[Type[Node], Node]:
             Node.
 
     Returns:
-        Union[Type[Node], Node]: a Node class or instance.
+        Union[Type[composites.Node], composites.Node]: a Node class or instance.
         
     """
     item.__hash__ = Node.__hash__ # type: ignore
@@ -96,8 +94,10 @@ def nodify(item: Union[Type[Any], object]) -> Union[Type[Node], Node]:
         if not hasattr(item, 'name') or not item.name:
             item.name = amos.namify(item = item)
     return item
+    
+""" Converters to Adjacency """
 
-# @amos.dispatcher 
+@functools.singledispatch
 def to_adjacency(item: Any) -> graphs.Adjacency:
     """Converts 'item' to an Adjacency.
     
@@ -119,7 +119,7 @@ def to_adjacency(item: Any) -> graphs.Adjacency:
             f'item cannot be converted because it is an unsupported type: '
             f'{type(item).__name__}')
 
-# @to_adjacency.register # type: ignore
+@to_adjacency.register # type: ignore
 def edges_to_adjacency(item: graphs.Edges) -> graphs.Adjacency:
     """Converts 'item' to an Adjacency.
 
@@ -140,7 +140,7 @@ def edges_to_adjacency(item: graphs.Edges) -> graphs.Adjacency:
             adjacency[edge_pair[1]] = set()
     return adjacency
 
-# @to_adjacency.register # type: ignore 
+@to_adjacency.register # type: ignore 
 def matrix_to_adjacency(item: graphs.Matrix) -> graphs.Adjacency:
     """Converts 'item' to an Adjacency.
 
@@ -166,7 +166,7 @@ def matrix_to_adjacency(item: graphs.Matrix) -> graphs.Adjacency:
         adjacency[new_key] = new_values
     return adjacency
 
-# @to_adjacency.register # type: ignore 
+@to_adjacency.register # type: ignore 
 def pipeline_to_adjacency(item: hybrids.Pipeline) -> graphs.Adjacency:
     """Converts 'item' to an Adjacency.
 
@@ -191,7 +191,7 @@ def pipeline_to_adjacency(item: hybrids.Pipeline) -> graphs.Adjacency:
                 adjacency[edge_pair[0]] = {edge_pair[1]}
     return adjacency
 
-# @to_adjacency.register # type: ignore 
+@to_adjacency.register # type: ignore 
 def pipelines_to_adjacency(item: hybrids.Pipelines) -> graphs.Adjacency:
     """Converts 'item' to an Adjacency.
 
@@ -214,7 +214,7 @@ def pipelines_to_adjacency(item: hybrids.Pipelines) -> graphs.Adjacency:
                 adjacency[key] = value
     return adjacency
 
-# @to_adjacency.register # type: ignore 
+@to_adjacency.register # type: ignore 
 def tree_to_adjacency(item: trees.Tree) -> graphs.Adjacency:
     """Converts 'item' to an Adjacency.
 
@@ -227,8 +227,8 @@ def tree_to_adjacency(item: trees.Tree) -> graphs.Adjacency:
     """
     raise NotImplementedError
              
-# @to_adjacency.register # type: ignore 
-def nodes_to_adjacency(item: core.Nodes) -> graphs.Adjacency:
+@to_adjacency.register # type: ignore 
+def nodes_to_adjacency(item: composites.Nodes) -> graphs.Adjacency:
     """Converts 'item' to an Adjacency.
 
     Args:
@@ -240,8 +240,10 @@ def nodes_to_adjacency(item: core.Nodes) -> graphs.Adjacency:
     """
     adjacency = collections.defaultdict(set)
     return adjacency.update((k, set()) for k in item)
+    
+""" Converters to Edges """
 
-# @amos.dispatcher   
+@functools.singledispatch  
 def to_edges(item: Any) -> graphs.Edges:
     """Converts 'item' to an Edges.
     
@@ -262,7 +264,7 @@ def to_edges(item: Any) -> graphs.Edges:
             f'item cannot be converted because it is an unsupported type: '
             f'{type(item).__name__}')
     
-# @to_edges.register # type: ignore
+@to_edges.register # type: ignore
 def adjacency_to_edges(item: graphs.Adjacency) -> graphs.Edges:
     """Converts 'item' to an Edges.
     
@@ -278,8 +280,10 @@ def adjacency_to_edges(item: graphs.Adjacency) -> graphs.Edges:
         for connection in connections:
             edges.append(tuple([node, connection]))
     return tuple(edges)
+    
+""" Converters to Matrix """
 
-# @amos.dispatcher   
+@functools.singledispatch   
 def to_matrix(item: Any) -> graphs.Matrix:
     """Converts 'item' to a Matrix.
     
@@ -300,7 +304,7 @@ def to_matrix(item: Any) -> graphs.Matrix:
             f'item cannot be converted because it is an unsupported type: '
             f'{type(item).__name__}')
 
-# @to_matrix.register # type: ignore 
+@to_matrix.register # type: ignore 
 def adjacency_to_matrix(item: graphs.Adjacency) -> graphs.Matrix:
     """Converts 'item' to a Matrix.
     
@@ -318,8 +322,33 @@ def adjacency_to_matrix(item: graphs.Adjacency) -> graphs.Matrix:
         for j in item[i]:
             matrix[i][j] = 1
     return tuple([matrix, names])    
+    
+""" Converters to Pipeline """
 
-# @amos.dispatcher   
+@functools.singledispatch  
+def to_pipeline(item: Any) -> hybrids.Pipeline:
+    """Converts 'item' to a Pipeline.
+    
+    Args:
+        item (Any): item to convert to a Pipeline.
+
+    Raises:
+        TypeError: if 'item' is a type that is not registered.
+
+    Returns:
+        hybrids.Pipeline: derived from 'item'.
+
+    """
+    if check.is_tree(item = item):
+        return item
+    else:
+        raise TypeError(
+            f'item cannot be converted because it is an unsupported type: '
+            f'{type(item).__name__}')
+    
+""" Converters to Tree """
+       
+@functools.singledispatch 
 def to_tree(item: Any) -> trees.Tree:
     """Converts 'item' to a Tree.
     
@@ -340,7 +369,7 @@ def to_tree(item: Any) -> trees.Tree:
             f'item cannot be converted because it is an unsupported type: '
             f'{type(item).__name__}')
 
-# @to_tree.register # type: ignore 
+@to_tree.register # type: ignore 
 def matrix_to_tree(item: graphs.Matrix) -> trees.Tree:
     """Converts 'item' to a Tree.
     
@@ -360,24 +389,3 @@ def matrix_to_tree(item: graphs.Matrix) -> trees.Tree:
         children.remove(node)
         tree[node] = matrix_to_tree(children)
     return tree
-
-# @amos.dispatcher   
-def to_pipeline(item: Any) -> sequences.pipeline:
-    """Converts 'item' to a Tree.
-    
-    Args:
-        item (Any): item to convert to a Tree.
-
-    Raises:
-        TypeError: if 'item' is a type that is not registered.
-
-    Returns:
-        tree.Tree: derived from 'item'.
-
-    """
-    if check.is_tree(item = item):
-        return item
-    else:
-        raise TypeError(
-            f'item cannot be converted because it is an unsupported type: '
-            f'{type(item).__name__}')

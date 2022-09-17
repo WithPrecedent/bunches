@@ -1,7 +1,7 @@
 """
-test_amos: tests classes in amos
+test_bunches: tests classes in bunches
 Corey Rayburn Yung <coreyrayburnyung@gmail.com>
-Copyright 2020-2021, Corey Rayburn Yung
+Copyright 2020-2022, Corey Rayburn Yung
 License: Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0)
 
 ToDo:
@@ -30,18 +30,18 @@ class ThirdClass(object):
     name: str = 'third'
 
 
-# def test_proxy():
-#     wrapped = TestClass()
-#     proxy = amos.Proxy(contents = wrapped)
-#     proxy.id = 4543
-#     assert proxy.name == 'something'
-#     assert proxy.id == 4543
-#     assert hasattr(proxy, 'id')
-#     del proxy.id
-#     assert not hasattr(proxy, 'id')
-#     proxy.name == 'something else'
-#     print('test proxy', proxy.name)
-#     assert proxy.name == 'something_else'
+def test_proxy():
+    wrapped = TestClass()
+    proxy = amos.Proxy(contents = wrapped)
+    proxy.id = 4543
+    assert proxy.name == 'something'
+    assert proxy.id == 4543
+    assert hasattr(proxy, 'id')
+    del proxy.id
+    assert not hasattr(proxy, 'id')
+    proxy.name == 'something else'
+    print('test proxy', proxy.name)
+    assert proxy.name == 'something_else'
     
 
 def test_listing():

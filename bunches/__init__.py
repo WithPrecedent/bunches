@@ -66,12 +66,13 @@ __author__ = 'Corey Rayburn Yung'
 
 
 from .base import *
+from .check import *
 from .composites import *
-from .converters import *
+from .convert import *
 from .forms import *
 from .graphs import *
 from .hybrids import *
-from .sequences import *
 from .mappings import *
+from .sequences import *
 from .traits import *
 from .trees import *

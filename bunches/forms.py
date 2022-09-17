@@ -1,5 +1,5 @@
 """
-forms: graphs with different internal storage formats
+forms: internal storage formats for graphs
 Corey Rayburn Yung <coreyrayburnyung@gmail.com>
 Copyright 2020-2022, Corey Rayburn Yung
 License: Apache-2.0
@@ -17,10 +17,10 @@ License: Apache-2.0
     limitations under the License.
 
 Contents:
-    Adjacency (mappings.Dictionary, core.Graph): a graph stored as an adjacency 
+    Adjacency (mappings.Dictionary, composites.Graph): a graph stored as an adjacency 
         list.
-    Edges (sequences.Listing, core.Graph): a graph stored as an edge list.
-    Matrix (sequences.Listing, core.Graph): a graph stored as an adjacency 
+    Edges (sequences.Listing, composites.Graph): a graph stored as an edge list.
+    Matrix (sequences.Listing, composites.Graph): a graph stored as an adjacency 
         matrix.
           
 To Do:
@@ -35,25 +35,27 @@ from collections.abc import (
 import dataclasses
 from typing import Any, ClassVar, Optional, Type, TYPE_CHECKING, Union
 
-from . import core
-from ..containers import mappings
-from ..containers import sequences
-from ..change import convert
-from ..observe import check
+from .import check
+from . import composites
+from . import convert
+from . import mappings
+from . import sequences
 
 
 @dataclasses.dataclass
-class Adjacency(mappings.Dictionary, core.Graph):
+class Adjacency(mappings.Dictionary, composites.Graph):
     """Base class for adjacency-list graphs.
     
     Args:
-        contents (MutableMapping[core.Node, Set[core.Node]]): keys are nodes and 
-            values are sets of nodes (or hashable representations of nodes). 
-            Defaults to a defaultdict that has a set for its value type.
+        contents (MutableMapping[composites.Node, Set[composites.Node]]): keys 
+            are nodes and values are sets of nodes (or hashable representations 
+            of nodes). Defaults to a defaultdict that has a set for its value 
+            type.
                                       
     """  
-    contents: MutableMapping[core.Node, Set[core.Node]] = dataclasses.field(
-        default_factory = lambda: collections.defaultdict(set))
+    contents: MutableMapping[composites.Node, Set[composites.Node]] = (
+        dataclasses.field(
+            default_factory = lambda: collections.defaultdict(set)))
    
     """ Properties """
 
@@ -106,15 +108,15 @@ class Adjacency(mappings.Dictionary, core.Graph):
 
 
 @dataclasses.dataclass
-class Edges(sequences.Listing, core.Graph):
+class Edges(sequences.Listing, composites.Graph):
     """Base class for edge-list graphs.
-    
+
     Args:
-        contents (tuple[tuple[core.Node, core.Node], ...]): tuple of tuple of 
-            edges. Defaults to an empty tuple.
+        contents (MutableSequence[composites.Edge]): list of edges. Defaults to 
+            an empty list.
                                       
     """   
-    contents: MutableSequence[core.Edge] = dataclasses.field(
+    contents: MutableSequence[composites.Edge] = dataclasses.field(
         default_factory = list)
    
     """ Properties """
@@ -169,7 +171,7 @@ class Edges(sequences.Listing, core.Graph):
     
     
 @dataclasses.dataclass
-class Matrix(sequences.Listing, core.Graph):
+class Matrix(sequences.Listing, composites.Graph):
     """Base class for adjacency-matrix graphs.
     
     Args:
