@@ -7,25 +7,23 @@ License: Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0)
 
 import dataclasses
 
-import amos
-
-import amos
+import bunches
 
 
 @dataclasses.dataclass
-class Something(amos.Node):
+class Something(bunches.Node):
     
     pass
 
 
 @dataclasses.dataclass
-class AnotherThing(amos.Node):
+class AnotherThing(bunches.Node):
     
     pass
 
 
 @dataclasses.dataclass
-class EvenAnother(amos.Node):
+class EvenAnother(bunches.Node):
     
     pass
 
@@ -34,14 +32,14 @@ def test_graph():
     # Tests adjacency matrix constructor
     matrix = tuple([[[0, 0, 1], [1, 0, 0], [0, 0, 0]],
                     ['scorpion', 'frog', 'river']])
-    workflow = amos.System.from_matrix(item = matrix)
+    workflow = bunches.System.from_matrix(item = matrix)
     assert 'scorpion' in workflow['frog']
     assert 'river' not in workflow['frog']
     # Tests adjacency list constructor
     adjacency = {'grumpy': {'sleepy'},
                  'doc': {},
                  'sneezy': {'grumpy', 'bashful'}}
-    workflow = amos.System.from_adjacency(item = adjacency)
+    workflow = bunches.System.from_adjacency(item = adjacency)
     assert 'sleepy' in workflow['grumpy']
     assert 'bashful' in workflow['sneezy']
     assert 'bashful' not in workflow['doc']
@@ -50,12 +48,12 @@ def test_graph():
              ('camera', 'man'), 
              ('person', 'man'), 
              ('tv', 'person')]
-    workflow_edges = amos.System.from_edges(item = edges)
+    workflow_edges = bunches.System.from_edges(item = edges)
     assert 'woman' in workflow_edges['camera']
     assert 'man' in workflow_edges['camera']
     assert 'tv' not in workflow_edges['person']
     # Tests manual construction
-    workflow = amos.System()
+    workflow = bunches.System()
     workflow.add('bonnie')
     workflow.add('clyde')
     workflow.add('butch')
@@ -79,7 +77,7 @@ def test_graph():
     assert ['bonnie', 'clyde'] in all_paths
     assert ['bonnie', 'henchman'] in all_paths
     workflow.merge(item = workflow_edges)
-    new_workflow = amos.System()
+    new_workflow = bunches.System()
     something = Something()
     another_thing = AnotherThing()
     even_another = EvenAnother()

@@ -6,30 +6,30 @@ License: Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0)
 """
 import dataclasses
 
-import amos
+import bunches
 
 
 @dataclasses.dataclass
-class Something(amos.Node):
+class Something(bunches.Node):
     
     pass
 
 
 @dataclasses.dataclass
-class AnotherThing(amos.Node):
+class AnotherThing(bunches.Node):
     
     pass
 
 
 @dataclasses.dataclass
-class EvenAnother(amos.Node):
+class EvenAnother(bunches.Node):
     
     pass
 
 
 def test_graph() -> None:
     edges = tuple([('a', 'b'), ('c', 'd'), ('a', 'd'), ('d', 'e')])
-    dag = amos.System.create(item = edges)
+    dag = bunches.System.create(item = edges)
     dag.add(node = 'cat')
     dag.add(node = 'dog', ancestors = 'e', descendants = ['cat'])
     assert dag['dog'] == {'cat'}
@@ -38,8 +38,8 @@ def test_graph() -> None:
         'tree': {'house', 'yard'},
         'house': set(),
         'yard': set()}
-    assert amos.Adjacency.__instancecheck__(adjacency)
-    another_dag = amos.System.create(item = adjacency)
+    assert bunches.Adjacency.__instancecheck__(adjacency)
+    another_dag = bunches.System.create(item = adjacency)
     dag.append(item = another_dag)
     assert dag['cat'] == {'tree'}
     pipelines = dag.pipelines 
@@ -49,9 +49,9 @@ def test_graph() -> None:
     assert dag.nodes == {
         'tree', 'b', 'c', 'a', 'yard', 'cat', 'd', 'house', 'dog', 'e'}
     pipeline = dag.pipeline
-    new_dag = amos.System.from_pipeline(item = pipeline)
+    new_dag = bunches.System.from_pipeline(item = pipeline)
     assert new_dag['tree'] == dag['tree']
-    another_dag = amos.System.from_pipelines(item = pipelines)
+    another_dag = bunches.System.from_pipelines(item = pipelines)
     assert another_dag['tree'] == dag['tree']
     return
 

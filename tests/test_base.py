@@ -9,7 +9,7 @@ ToDo:
 """
 import dataclasses
 
-import amos
+import bunches
 
 
 @dataclasses.dataclass
@@ -32,7 +32,7 @@ class ThirdClass(object):
 
 def test_proxy():
     wrapped = TestClass()
-    proxy = amos.Proxy(contents = wrapped)
+    proxy = bunches.Proxy(contents = wrapped)
     proxy.id = 4543
     assert proxy.name == 'something'
     assert proxy.id == 4543
@@ -45,7 +45,7 @@ def test_proxy():
     
 
 def test_listing():
-    listing = amos.Listing(contents = ['a', 'b', 'c'])
+    listing = bunches.Listing(contents = ['a', 'b', 'c'])
     assert listing[1] == 'b'
     listing.add(item = 'd')
     assert listing[3] == 'd'
@@ -65,7 +65,7 @@ def test_listing():
     return
 
 def test_hybrid():
-    hybrid = amos.Hybrid(contents = ['a', 'b', 'c'])
+    hybrid = bunches.Hybrid(contents = ['a', 'b', 'c'])
     hybrid.setdefault(value = 'No')
     assert hybrid.get('tree') == 'No'
     assert hybrid[1] == 'b'
@@ -94,11 +94,11 @@ def test_hybrid():
     return
 
 def test_dictionary():
-    alt_created = amos.Dictionary.fromkeys(
+    alt_created = bunches.Dictionary.fromkeys(
         keys = ['a', 'b', 'c'], 
         value = 'tree')
     assert alt_created['a'] == 'tree'
-    dictionary = amos.Dictionary(
+    dictionary = bunches.Dictionary(
         contents = {'a': 'b', 'c': 'd'}, 
         default_factory = 'Nada')
     assert dictionary.get('f') == 'Nada'
@@ -113,7 +113,7 @@ def test_dictionary():
     return
 
 def test_catalog():
-    catalog = amos.Catalog(contents = {'tester': TestClass})
+    catalog = bunches.Catalog(contents = {'tester': TestClass})
     catalog.add({'another': AnotherClass})
     catalog.add({'a_third': ThirdClass()})
     assert 'tester' in catalog
@@ -129,7 +129,7 @@ def test_catalog():
     return
     
 def test_library():
-    library = amos.Library(classes = amos.Catalog(contents = {
+    library = bunches.Library(classes = bunches.Catalog(contents = {
         'tester': TestClass}))
     library.deposit(AnotherClass())
     library.deposit(ThirdClass, 'random_name')
@@ -146,6 +146,7 @@ def test_library():
  
 if __name__ == '__main__':
     # test_proxy()
+    print('testing')
     test_listing()
     test_hybrid()
     test_dictionary()
