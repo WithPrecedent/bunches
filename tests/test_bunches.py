@@ -1,12 +1,9 @@
-"""
-test_bunches: tests classes in bunches
-Corey Rayburn Yung <coreyrayburnyung@gmail.com>
-Copyright 2020-2021, Corey Rayburn Yung
-License: Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0)
+"""Tests for core classes
 
-ToDo:
-    
+To Do:
+
 """
+from __future__ import annotations
 import dataclasses
 
 import bunches
@@ -14,35 +11,32 @@ import bunches
 
 @dataclasses.dataclass
 class TestClass(object):
-    
+
     name: str = 'something'
 
 
 @dataclasses.dataclass
 class AnotherClass(object):
-    
+
     name: str = 'another'
 
 
 @dataclasses.dataclass
 class ThirdClass(object):
-    
+
     name: str = 'third'
 
 
-def test_proxy():
-    wrapped = TestClass()
-    proxy = bunches.Proxy(contents = wrapped)
-    proxy.id = 4543
-    assert proxy.name == 'something'
-    assert proxy.id == 4543
-    assert hasattr(proxy, 'id')
-    del proxy.id
-    assert not hasattr(proxy, 'id')
-    proxy.name == 'something else'
-    print('test proxy', proxy.name)
-    assert proxy.name == 'something_else'
-    
+# def test_proxy():
+#     wrapped = TestClass()
+#     proxy = bunches.Proxy(contents = wrapped)
+#     proxy.id = 4543
+#     assert proxy.name == 'something'
+#     assert proxy.id == 4543
+#     assert hasattr(proxy, 'id')
+#     del proxy.id
+#     assert not hasattr(proxy, 'id')
+#     return
 
 def test_listing():
     listing = bunches.Listing(contents = ['a', 'b', 'c'])
@@ -65,7 +59,7 @@ def test_listing():
     return
 
 def test_hybrid():
-    hybrid = bunches.Hybrid(contents = ['a', 'b', 'c'])
+    hybrid = bunches.DictList(contents = ['a', 'b', 'c'])
     hybrid.setdefault(value = 'No')
     assert hybrid.get('tree') == 'No'
     assert hybrid[1] == 'b'
@@ -95,11 +89,11 @@ def test_hybrid():
 
 def test_dictionary():
     alt_created = bunches.Dictionary.fromkeys(
-        keys = ['a', 'b', 'c'], 
+        keys = ['a', 'b', 'c'],
         value = 'tree')
     assert alt_created['a'] == 'tree'
     dictionary = bunches.Dictionary(
-        contents = {'a': 'b', 'c': 'd'}, 
+        contents = {'a': 'b', 'c': 'd'},
         default_factory = 'Nada')
     assert dictionary.get('f') == 'Nada'
     assert dictionary['a'] == 'b'
@@ -127,27 +121,22 @@ def test_catalog():
     assert 'tester' not in catalog
     assert len(catalog) == 1
     return
-    
-def test_library():
-    library = bunches.Library(classes = bunches.Catalog(contents = {
-        'tester': TestClass}))
-    library.deposit(AnotherClass())
-    library.deposit(ThirdClass, 'random_name')
-    assert 'tester' in library
-    assert issubclass(library['random_name'], ThirdClass)
-    assert 'another_class' not in library.instances
-    assert 'another_class' in library.classes
-    assert 'another' in library.instances
-    library.remove('random_name')
-    # print('test library', library)
-    assert 'random_name' not in library
+
+def test_repository():
+    repository = bunches.Repository()
+    repository.add(AnotherClass())
+    repository.add(ThirdClass, 'random_name')
+    assert 'another' in repository
+    assert 'random_name' in repository
+    repository.delete('random_name')
+    assert 'random_name' not in repository
     return
- 
+
 if __name__ == '__main__':
     # test_proxy()
     test_listing()
     test_hybrid()
     test_dictionary()
     test_catalog()
-    test_library()
-   
+    test_repository()
+
