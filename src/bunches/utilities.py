@@ -145,6 +145,7 @@ def _uniquify(
     Args:
         key: name of key to test.
         dictionary: `dict` for which a unique key name is sought.
+        index: current index number for suffix. Defaults to 1.
 
     Returns:
         str: unique key name for 'dictionary'.
@@ -155,7 +156,7 @@ def _uniquify(
     counter = index
     while True:
         counter += 1
-        if counter > 2:
+        if counter > 2:  # noqa: PLR2004
             key = key.removesuffix(str(counter - 1))
         key = ''.join([key, str(counter)])
         if key not in dictionary:
