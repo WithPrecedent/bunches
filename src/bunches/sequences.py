@@ -25,11 +25,11 @@ if TYPE_CHECKING:
 
 @dataclasses.dataclass
 class Listing(base.Bunch, MutableSequence):
-    """Basic bunches list replacement.
+    """Basic `list` replacement.
 
-    A Listing differs from an ordinary python list in ways required by
-    inheriting from Bunch: `add`, `delete`, and `subset` methods, and allowing
-    the "+" operator to join Listings with other list-like objects) and in 1
+    A `Listing` differs from an ordinary python `list` in ways required by
+    inheriting from `Bunch`: `add`, `delete`, and `subset` methods, and allowing
+    the "+" operator to join `Listing`s with other `list`-like objects) and in 1
     other way:
         1) It includes a `prepend` method for adding one or more items to the
             beginning of the stored list.
@@ -329,7 +329,7 @@ class DictList(Listing):
         corresponding index.
 
         If only one match is found, a single item is returned. If more are
-        found, a `DictList` or `DictList` subclass with the matching `name` 
+        found, a `DictList` or `DictList` subclass with the matching `name`
         attributes is returned.
 
         Args:
@@ -348,7 +348,7 @@ class DictList(Listing):
             c for c in self.contents if utilities._namify(c) == key]
         if not matches:
             raise KeyError(f'{key} is not in {self.__class__.__name__}')
-        elif len(matches) == 1:
+        if len(matches) == 1:
             return matches[0]
         else:
             return matches

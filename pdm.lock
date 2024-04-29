@@ -5,7 +5,19 @@
 groups = ["default", "docs", "quality", "tests"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:1ec6d956300a63632ab5ccb73def72ddec66c5f53c5eee5f2d57906f30400cec"
+content_hash = "sha256:5dd42c479e27b6f1bf790531b15be77ff8cc6933e40479d8b3b477e660f84656"
+
+[[package]]
+name = "astmonkey"
+version = "0.3.6"
+summary = "astmonkey is a set of tools to play with Python AST."
+groups = ["tests"]
+dependencies = [
+    "pydot",
+]
+files = [
+    {file = "astmonkey-0.3.6.tar.gz", hash = "sha256:f82dbdd18a2d1810ef43782d3a29743bacd2b09422b8193a72a572b118c8cfb5"},
+]
 
 [[package]]
 name = "babel"
@@ -16,6 +28,17 @@ groups = ["docs"]
 files = [
     {file = "Babel-2.14.0-py3-none-any.whl", hash = "sha256:efb1a25b7118e67ce3a259bed20545c29cb68be8ad2c784c83689981b7a57287"},
     {file = "Babel-2.14.0.tar.gz", hash = "sha256:6919867db036398ba21eb5c7a0f6b28ab8cbc3ae7a73a44ebe34ae74a4e7d363"},
+]
+
+[[package]]
+name = "bytecode"
+version = "0.13.0"
+requires_python = ">=3.6"
+summary = "Python module to generate and modify bytecode"
+groups = ["tests"]
+files = [
+    {file = "bytecode-0.13.0-py3-none-any.whl", hash = "sha256:e69f92e7d27f99d5d7d76e6a824bd3d9ff857c72b59927aaf87e1a620f67fe50"},
+    {file = "bytecode-0.13.0.tar.gz", hash = "sha256:6af3c2f0a31ce05dce41f7eea5cc380e33f5e8fbb7dcee3b52467a00acd52fcd"},
 ]
 
 [[package]]
@@ -119,6 +142,16 @@ groups = ["docs", "tests"]
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
+]
+
+[[package]]
+name = "commonmark"
+version = "0.9.1"
+summary = "Python parser for the CommonMark Markdown spec"
+groups = ["tests"]
+files = [
+    {file = "commonmark-0.9.1-py2.py3-none-any.whl", hash = "sha256:da2f38c92590f83de410ba1a3cbceafbc74fee9def35f9251ba9a971d6d66fd9"},
+    {file = "commonmark-0.9.1.tar.gz", hash = "sha256:452f9dc859be7f06631ddcb328b6919c67984aca654e5fefb3914d54691aed60"},
 ]
 
 [[package]]
@@ -359,11 +392,53 @@ files = [
 ]
 
 [[package]]
+name = "jellyfish"
+version = "0.11.2"
+requires_python = ">=3.7"
+summary = "Approximate and phonetic matching of strings."
+groups = ["tests"]
+files = [
+    {file = "jellyfish-0.11.2-cp310-cp310-macosx_10_7_x86_64.whl", hash = "sha256:58385a72663e53d753c8c3131d609f35be841068ac319c507bc49c951333b394"},
+    {file = "jellyfish-0.11.2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:ec049a17942be3ecfd239a8fe9cf34caaf063ac9c14e700fe59b74528798aedd"},
+    {file = "jellyfish-0.11.2-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7d51a3cc18b1143f03c135ea34919daf2f87126c5e55b0f2e60e4616f1765f8d"},
+    {file = "jellyfish-0.11.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a1b1ae7e64e9d58c0d4ce2278a229f3f7ead5eb2744f90369f3967f3c666f28f"},
+    {file = "jellyfish-0.11.2-cp310-cp310-musllinux_1_1_i686.whl", hash = "sha256:b2e563bdaa9abb028b4a9bca9903aaa463a2bae7b05e7af50326d2c1ba959f8e"},
+    {file = "jellyfish-0.11.2-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:4db605459280deefc2b3497932aeb2784c54ede2aec786a4120cf650281652ad"},
+    {file = "jellyfish-0.11.2-cp310-none-win32.whl", hash = "sha256:bd8000a32da09cbb717d7434c39bf7421e7d8367a711fe617fa6addee3572740"},
+    {file = "jellyfish-0.11.2-cp310-none-win_amd64.whl", hash = "sha256:9df6bb8ba3c6f2508dc030ed77e489f427d44cf24557a0a8ab2bba3c19af99d6"},
+    {file = "jellyfish-0.11.2-cp311-cp311-macosx_10_7_x86_64.whl", hash = "sha256:54af2ca0db82b57c022aa3e3a5ed5fa57ac2b8ab3c005ecefc975a648bf771c6"},
+    {file = "jellyfish-0.11.2-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:f44546131011cbaa76f2a38d87faeec73524efa812d04b7d3edbf6e6e76c4969"},
+    {file = "jellyfish-0.11.2-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:6245916cb73242828ba4f8f44dec3f149b96965848d59d3d66b1f809208dc39a"},
+    {file = "jellyfish-0.11.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6ba932f17566a21c009dac8167c0289dd2175c219eea3f3f695d043c50989f46"},
+    {file = "jellyfish-0.11.2-cp311-cp311-musllinux_1_1_i686.whl", hash = "sha256:a9e70e018c9620378c95b28de6d597c6cf87cd0b9e9b446444468e7e411b159d"},
+    {file = "jellyfish-0.11.2-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:44cbafbe1bdf9e878ac144880d15f31ab79fb4f5fb22a7df55378519d80cfdcc"},
+    {file = "jellyfish-0.11.2-cp311-none-win32.whl", hash = "sha256:0cbe9f573dfd0bffbe60fb6980d54e65c7772dec217c4bc68392141458c8406e"},
+    {file = "jellyfish-0.11.2-cp311-none-win_amd64.whl", hash = "sha256:cad06b9d0f76d5d030bcb8b86454e50aae8166b1c507d3d610743abcf8b7881a"},
+    {file = "jellyfish-0.11.2-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:91912106d47b5367704d3e222822750998610a12b1aa9b259eb38bf059aa2383"},
+    {file = "jellyfish-0.11.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:76c452ef0f0241fabbd6943abfccbcb29dc6078ccc1dcef066fe537bb518ad6e"},
+    {file = "jellyfish-0.11.2-pp37-pypy37_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:26b07f9f957054a99573d51c40118aa1a400354da54e65d24cf22c41840f7a95"},
+    {file = "jellyfish-0.11.2-pp37-pypy37_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1613e6623de71008c4b27250b8f2c5406104beff6487b9fe48af5089e06de2dd"},
+    {file = "jellyfish-0.11.2-pp38-pypy38_pp73-macosx_10_7_x86_64.whl", hash = "sha256:60e3b8e7e38b85df90f2e04eeed592fe1abc71941ce09e57a8956e21f05ce64f"},
+    {file = "jellyfish-0.11.2-pp38-pypy38_pp73-macosx_11_0_arm64.whl", hash = "sha256:90fc8c600252072e48c5bc4e0e4d835c440c9c94f69e1d26a672328e17de3ec8"},
+    {file = "jellyfish-0.11.2-pp38-pypy38_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:cd1a25a4ff4b75b8a91ba42f6a27a5f423d0cb1ae2f29090a99e0a29afdfefdc"},
+    {file = "jellyfish-0.11.2-pp38-pypy38_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6bff57058fb2c9ffefe4b683a4c61de58346603ef699f768f173a2a0637a0c16"},
+    {file = "jellyfish-0.11.2-pp38-pypy38_pp73-musllinux_1_1_i686.whl", hash = "sha256:9a92d5dce96711fad362399c8a569923b488ab108f531157ca381decc7096d7d"},
+    {file = "jellyfish-0.11.2-pp38-pypy38_pp73-musllinux_1_1_x86_64.whl", hash = "sha256:16cf6a55433ca4fe8f13d5ba96882a058d19030bcd8c50cdd8f62009c4106c55"},
+    {file = "jellyfish-0.11.2-pp39-pypy39_pp73-macosx_10_7_x86_64.whl", hash = "sha256:8f9f5f2af653696c29466a94bf0237c64fe21699d9416e0e94ca51863c1ce96a"},
+    {file = "jellyfish-0.11.2-pp39-pypy39_pp73-macosx_11_0_arm64.whl", hash = "sha256:661c46b427a1c2a4b4343bda71354a37e897648239f8831d149eb1e7a2bf902c"},
+    {file = "jellyfish-0.11.2-pp39-pypy39_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5204365138dbbd50f634cb246a4812f64d3b3054d32825c16c5176cae2171dcf"},
+    {file = "jellyfish-0.11.2-pp39-pypy39_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0c289620b2a1931237b75f4a08f93531f3a9a0125a840c8a780e50688520b266"},
+    {file = "jellyfish-0.11.2-pp39-pypy39_pp73-musllinux_1_1_i686.whl", hash = "sha256:b5136535cbf5535090ce99a1f56cfaec43f11f29277faf67241f4bf6f0b578bc"},
+    {file = "jellyfish-0.11.2-pp39-pypy39_pp73-musllinux_1_1_x86_64.whl", hash = "sha256:ed39ff56c19a4150f412b63e9835354c929f3d8108c586d604cc1c342f0ca34c"},
+    {file = "jellyfish-0.11.2.tar.gz", hash = "sha256:654f2b1543b9927c4429bd5d66f98d1f47e6eb9a4e56212e1907fb4eea258c5a"},
+]
+
+[[package]]
 name = "jinja2"
 version = "3.1.3"
 requires_python = ">=3.7"
 summary = "A very fast and expressive template engine."
-groups = ["docs"]
+groups = ["docs", "tests"]
 dependencies = [
     "MarkupSafe>=2.0",
 ]
@@ -425,7 +500,7 @@ name = "markupsafe"
 version = "2.1.5"
 requires_python = ">=3.7"
 summary = "Safely add untrusted strings to HTML/XML markup."
-groups = ["docs"]
+groups = ["docs", "tests"]
 files = [
     {file = "MarkupSafe-2.1.5-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:a17a92de5231666cfbe003f0e4b9b3a7ae3afb1ec2845aadc2bacc93ff85febc"},
     {file = "MarkupSafe-2.1.5-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:72b6be590cc35924b02c78ef34b467da4ba07e4e0f0454a2c5907f473fc50ce5"},
@@ -464,7 +539,7 @@ files = [
 name = "mergedeep"
 version = "1.3.4"
 requires_python = ">=3.6"
-summary = "A deep merge function for ðŸ��."
+summary = "A deep merge function for 🐍."
 groups = ["docs"]
 files = [
     {file = "mergedeep-1.3.4-py3-none-any.whl", hash = "sha256:70775750742b25c0d8f36c55aed03d24c3384d17c951b3175d898bd778ef0307"},
@@ -676,6 +751,60 @@ files = [
 ]
 
 [[package]]
+name = "mutpy-pynguin"
+version = "0.7.1"
+requires_python = ">=3.8"
+summary = "Mutation testing tool for Python 3.x source code."
+groups = ["tests"]
+dependencies = [
+    "Jinja2>=2.7.1",
+    "PyYAML>=5.3.1",
+    "astmonkey>=0.3.6",
+    "termcolor>=1.0.0",
+]
+files = [
+    {file = "MutPy-Pynguin-0.7.1.tar.gz", hash = "sha256:31fe168eff221ece0129768b68375ca0d03c6514567caf19878ae7a618b9ab89"},
+    {file = "MutPy_Pynguin-0.7.1-py3-none-any.whl", hash = "sha256:9c6ce1afe1f818e97a16f498d0f3ecf65127d93ac74f70eea5ee7b0833122a4e"},
+]
+
+[[package]]
+name = "mypy-extensions"
+version = "1.0.0"
+requires_python = ">=3.5"
+summary = "Type system extensions for programs checked with the mypy type checker."
+groups = ["tests"]
+files = [
+    {file = "mypy_extensions-1.0.0-py3-none-any.whl", hash = "sha256:4392f6c0eb8a5668a69e23d168ffa70f0be9ccfd32b5cc2d26a34ae5b844552d"},
+    {file = "mypy_extensions-1.0.0.tar.gz", hash = "sha256:75dbf8955dc00442a438fc4d0666508a9a97b6bd41aa2f0ffe9d2f2725af0782"},
+]
+
+[[package]]
+name = "networkx"
+version = "2.8.8"
+requires_python = ">=3.8"
+summary = "Python package for creating and manipulating graphs and networks"
+groups = ["tests"]
+files = [
+    {file = "networkx-2.8.8-py3-none-any.whl", hash = "sha256:e435dfa75b1d7195c7b8378c3859f0445cd88c6b0375c181ed66823a9ceb7524"},
+    {file = "networkx-2.8.8.tar.gz", hash = "sha256:230d388117af870fce5647a3c52401fcf753e94720e6ea6b4197a5355648885e"},
+]
+
+[[package]]
+name = "networkx"
+version = "2.8.8"
+extras = ["pydot"]
+requires_python = ">=3.8"
+summary = "Python package for creating and manipulating graphs and networks"
+groups = ["tests"]
+dependencies = [
+    "networkx==2.8.8",
+]
+files = [
+    {file = "networkx-2.8.8-py3-none-any.whl", hash = "sha256:e435dfa75b1d7195c7b8378c3859f0445cd88c6b0375c181ed66823a9ceb7524"},
+    {file = "networkx-2.8.8.tar.gz", hash = "sha256:230d388117af870fce5647a3c52401fcf753e94720e6ea6b4197a5355648885e"},
+]
+
+[[package]]
 name = "nodeenv"
 version = "1.8.0"
 requires_python = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*"
@@ -687,6 +816,17 @@ dependencies = [
 files = [
     {file = "nodeenv-1.8.0-py2.py3-none-any.whl", hash = "sha256:df865724bb3c3adc86b3876fa209771517b0cfe596beff01a92700e0e8be4cec"},
     {file = "nodeenv-1.8.0.tar.gz", hash = "sha256:d51e0c37e64fbf47d017feac3145cdbb58836d7eee8c6f6d3b6880c5456227d2"},
+]
+
+[[package]]
+name = "ordered-set"
+version = "4.1.0"
+requires_python = ">=3.7"
+summary = "An OrderedSet is a custom MutableSet that remembers its order, so that every"
+groups = ["tests"]
+files = [
+    {file = "ordered-set-4.1.0.tar.gz", hash = "sha256:694a8e44c87657c59292ede72891eb91d34131f6531463aab3009191c77364a8"},
+    {file = "ordered_set-4.1.0-py3-none-any.whl", hash = "sha256:046e1132c71fcf3330438a539928932caf51ddbc582496833e23de611de14562"},
 ]
 
 [[package]]
@@ -761,11 +901,25 @@ files = [
 ]
 
 [[package]]
+name = "pydot"
+version = "1.4.2"
+requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+summary = "Python interface to Graphviz's Dot"
+groups = ["tests"]
+dependencies = [
+    "pyparsing>=2.1.4",
+]
+files = [
+    {file = "pydot-1.4.2-py2.py3-none-any.whl", hash = "sha256:66c98190c65b8d2e2382a441b4c0edfdb4f4c025ef9cb9874de478fb0793a451"},
+    {file = "pydot-1.4.2.tar.gz", hash = "sha256:248081a39bcb56784deb018977e428605c1c758f10897a339fce1dd728ff007d"},
+]
+
+[[package]]
 name = "pygments"
 version = "2.17.2"
 requires_python = ">=3.7"
 summary = "Pygments is a syntax highlighting package written in Python."
-groups = ["docs"]
+groups = ["docs", "tests"]
 files = [
     {file = "pygments-2.17.2-py3-none-any.whl", hash = "sha256:b27c2826c47d0f3219f29554824c30c5e8945175d888647acd804ddd04af846c"},
     {file = "pygments-2.17.2.tar.gz", hash = "sha256:da46cec9fd2de5be3a8a784f434e4c4ab670b4ff54d605c4c2717e9d49c4c367"},
@@ -787,9 +941,45 @@ files = [
 ]
 
 [[package]]
+name = "pynguin"
+version = "0.19.0"
+requires_python = ">=3.10,<4.0"
+summary = "Pynguin is a tool for automated unit test generation for Python"
+groups = ["tests"]
+dependencies = [
+    "Jinja2<4.0,>=3.0",
+    "MutPy-Pynguin<0.8.0,>=0.7.1",
+    "Pygments<3.0,>=2.11",
+    "bytecode<1,>=0",
+    "jellyfish<1,>=0",
+    "networkx[pydot]<3,>=2",
+    "ordered-set<5.0,>=4.1",
+    "pydot<2.0,>=1.4",
+    "pytest<8.0,>=7.1",
+    "rich<13.0,>=12.0",
+    "simple-parsing<0.0.19,>=0.0.18",
+    "typing-inspect<1,>=0",
+]
+files = [
+    {file = "pynguin-0.19.0-py3-none-any.whl", hash = "sha256:d1709ecd28911e96d0a5bf599c33ba9462becc6579b75ef347ddfb1aa4068302"},
+    {file = "pynguin-0.19.0.tar.gz", hash = "sha256:ccee9e6d85f773228883deaf462cdf3ebf5d96a287e6cb11c46d9302bb9fa72f"},
+]
+
+[[package]]
+name = "pyparsing"
+version = "3.1.2"
+requires_python = ">=3.6.8"
+summary = "pyparsing module - Classes and methods to define and execute parsing grammars"
+groups = ["tests"]
+files = [
+    {file = "pyparsing-3.1.2-py3-none-any.whl", hash = "sha256:f9db75911801ed778fe61bb643079ff86601aca99fcae6345aa67292038fb742"},
+    {file = "pyparsing-3.1.2.tar.gz", hash = "sha256:a1bac0ce561155ecc3ed78ca94d3c9378656ad4c94c1270de543f621420f94ad"},
+]
+
+[[package]]
 name = "pytest"
-version = "8.1.1"
-requires_python = ">=3.8"
+version = "7.4.4"
+requires_python = ">=3.7"
 summary = "pytest: simple powerful testing with Python"
 groups = ["tests"]
 dependencies = [
@@ -797,12 +987,12 @@ dependencies = [
     "exceptiongroup>=1.0.0rc8; python_version < \"3.11\"",
     "iniconfig",
     "packaging",
-    "pluggy<2.0,>=1.4",
-    "tomli>=1; python_version < \"3.11\"",
+    "pluggy<2.0,>=0.12",
+    "tomli>=1.0.0; python_version < \"3.11\"",
 ]
 files = [
-    {file = "pytest-8.1.1-py3-none-any.whl", hash = "sha256:2a8386cfc11fa9d2c50ee7b2a57e7d898ef90470a7a34c4b949ff59662bb78b7"},
-    {file = "pytest-8.1.1.tar.gz", hash = "sha256:ac978141a75948948817d360297b7aae0fcb9d6ff6bc9ec6d514b85d5a65c044"},
+    {file = "pytest-7.4.4-py3-none-any.whl", hash = "sha256:b090cdf5ed60bf4c45261be03239c2c1c22df034fbffe691abe93cd80cea01d8"},
+    {file = "pytest-7.4.4.tar.gz", hash = "sha256:2cf0005922c6ace4a3e2ec8b4080eb0d9753fdc93107415332f50ce9e7994280"},
 ]
 
 [[package]]
@@ -868,7 +1058,7 @@ name = "pyyaml"
 version = "6.0.1"
 requires_python = ">=3.6"
 summary = "YAML parser and emitter for Python"
-groups = ["docs", "quality"]
+groups = ["docs", "quality", "tests"]
 files = [
     {file = "PyYAML-6.0.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d858aa552c999bc8a8d57426ed01e40bef403cd8ccdd0fc5f6f04a00414cac2a"},
     {file = "PyYAML-6.0.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:fd66fc5d0da6d9815ba2cebeb4205f95818ff4b79c3ebe268e75d961704af52f"},
@@ -984,6 +1174,21 @@ files = [
 ]
 
 [[package]]
+name = "rich"
+version = "12.6.0"
+requires_python = ">=3.6.3,<4.0.0"
+summary = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
+groups = ["tests"]
+dependencies = [
+    "commonmark<0.10.0,>=0.9.0",
+    "pygments<3.0.0,>=2.6.0",
+]
+files = [
+    {file = "rich-12.6.0-py3-none-any.whl", hash = "sha256:a4eb26484f2c82589bd9a17c73d32a010b1e29d89f1604cd9bf3a2097b81bb5e"},
+    {file = "rich-12.6.0.tar.gz", hash = "sha256:ba3a3775974105c221d31141f2c116f4fd65c5ceb0698657a11e9f295ec93fd0"},
+]
+
+[[package]]
 name = "ruff"
 version = "0.4.0"
 requires_python = ">=3.7"
@@ -1021,6 +1226,20 @@ files = [
 ]
 
 [[package]]
+name = "simple-parsing"
+version = "0.0.18"
+requires_python = ">=3.6"
+summary = "A small utility for simplifying and cleaning up argument parsing scripts."
+groups = ["tests"]
+dependencies = [
+    "typing-inspect",
+]
+files = [
+    {file = "simple_parsing-0.0.18-py3-none-any.whl", hash = "sha256:86dd309e47839b5b9ff7bbf20aeef5ddd072fbc5d04777a795dc98eccfdf8129"},
+    {file = "simple_parsing-0.0.18.tar.gz", hash = "sha256:8cdd8e2c5b7bf99d579027a6d12ef88218a1dc9b121cd5762820565a734eee82"},
+]
+
+[[package]]
 name = "six"
 version = "1.16.0"
 requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
@@ -1040,6 +1259,17 @@ groups = ["docs"]
 files = [
     {file = "smmap-5.0.1-py3-none-any.whl", hash = "sha256:e6d8668fa5f93e706934a62d7b4db19c8d9eb8cf2adbb75ef1b675aa332b69da"},
     {file = "smmap-5.0.1.tar.gz", hash = "sha256:dceeb6c0028fdb6734471eb07c0cd2aae706ccaecab45965ee83f11c8d3b1f62"},
+]
+
+[[package]]
+name = "termcolor"
+version = "2.4.0"
+requires_python = ">=3.8"
+summary = "ANSI color formatting for output in terminal"
+groups = ["tests"]
+files = [
+    {file = "termcolor-2.4.0-py3-none-any.whl", hash = "sha256:9297c0df9c99445c2412e832e882a7884038a25617c60cea2ad69488d4040d63"},
+    {file = "termcolor-2.4.0.tar.gz", hash = "sha256:aab9e56047c8ac41ed798fa36d892a37aca6b3e9159f3e0c24bc64a9b3ac7b7a"},
 ]
 
 [[package]]
@@ -1063,6 +1293,31 @@ marker = "python_version < \"3.11\""
 files = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
+]
+
+[[package]]
+name = "typing-extensions"
+version = "4.11.0"
+requires_python = ">=3.8"
+summary = "Backported and Experimental Type Hints for Python 3.8+"
+groups = ["tests"]
+files = [
+    {file = "typing_extensions-4.11.0-py3-none-any.whl", hash = "sha256:c1f94d72897edaf4ce775bb7558d5b79d8126906a14ea5ed1635921406c0387a"},
+    {file = "typing_extensions-4.11.0.tar.gz", hash = "sha256:83f085bd5ca59c80295fc2a82ab5dac679cbe02b9f33f7d83af68e241bea51b0"},
+]
+
+[[package]]
+name = "typing-inspect"
+version = "0.9.0"
+summary = "Runtime inspection utilities for typing module."
+groups = ["tests"]
+dependencies = [
+    "mypy-extensions>=0.3.0",
+    "typing-extensions>=3.7.4",
+]
+files = [
+    {file = "typing_inspect-0.9.0-py3-none-any.whl", hash = "sha256:9ee6fc59062311ef8547596ab6b955e1b8aa46242d854bfc78f4f6b0eff35f9f"},
+    {file = "typing_inspect-0.9.0.tar.gz", hash = "sha256:b23fc42ff6f6ef6954e4852c1fb512cdd18dbea03134f91f856a95ccc9461f78"},
 ]
 
 [[package]]

@@ -12,7 +12,7 @@ from __future__ import annotations
 import copy
 import inspect
 import re
-from collections.abc import Iterable, Sequence
+from collections.abc import Collection, Iterable, Sequence
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -20,36 +20,30 @@ if TYPE_CHECKING:
 
 
 def _capitalify(item: str) -> str:
-    """Converts a snake case str to capital case.
+    """Converts a snake case `str` to capital case.
 
     Args:
-        item (str): str to convert.
+        item: `str` to convert.
 
     Returns:
-        str: 'item' converted to capital case.
+        'item' converted to capital case.
 
     """
     return item.replace('_', ' ').title().replace(' ', '')
 
-def _is_sequence(item: Any, include_str: bool = False) -> bool:
-    """Returns if 'item' is a sequence.
-
-    If 'exclude_str' is True (the default) and 'item' is a str, False will be
-    returned.
+def _is_sequence(item: Any) -> bool:
+    """Returns if 'item' is a sequence but not a `str`.
 
     Args:
         item: object to examine.
-        include_str: whether to return True if 'item' is a str.
 
     Returns:
-        bool: if 'item' is a sequence.
+        If 'item' is a sequence but not a `str`.
 
     """
     if not inspect.isclass(item):
         item = item.__class__
-    return (
-        issubclass(item, Sequence)
-        and (not issubclass(item, str) or include_str))
+    return issubclass(item, Sequence) and not issubclass(item, str)
 
 def _iterify(item: Any) -> Iterable:
     """Returns `item` as an iterable, but does not iterate `str` types.
@@ -73,12 +67,11 @@ def _iterify(item: Any) -> Iterable:
             return iter((item,))
 
 def _namify(item: Any, /, default: str | None = None) -> str | None:
-    """Returns str name representation of 'item'.
+    """Returns `str` name representation of 'item'.
 
     Args:
-        item (Any): item to determine a str name.
-        default(Optional[str]): default name to return if other methods at name
-            creation fail.
+        item: item to determine a `str` name.
+        default: default name to return if other methods at name creation fail.
 
     Returns:
         str: a name representation of 'item.'
@@ -101,27 +94,26 @@ def _namify(item: Any, /, default: str | None = None) -> str | None:
                 return default
 
 def _return_subset(
-    subset: GenericDict,
-    existing: GenericDict,
-    returns: SubsetReturns) -> GenericDict:
-    """_summary_
+    subset: Collection,
+    existing: Collection,
+    returns: SubsetReturns) -> Collection:
+    """Returns a subset of an item.
 
     Args:
-        subset: _description_
-        existing:
-        returns: _description_
-        kwargs:
+        subset: native Python subset of data from a `Collection`.
+        existing: a subclasss instance of `Collection`.
+        returns: the type to be be returned by the function.
 
     Returns:
-        GenericDict: _description_
+        A `Collection` with a `subset` of data.
 
     """
     if returns == "class":
         return existing.__class__(subset)
     elif returns == "copy":
-        new_dict = copy.deepcopy(existing)
-        new_dict.contents = subset
-        return new_dict
+        new_collection = copy.deepcopy(existing)
+        new_collection.contents = subset
+        return new_collection
     elif returns == "simple":
         return subset
     else:
@@ -129,10 +121,10 @@ def _return_subset(
         raise ValueError(message)
 
 def _snakify(item: str) -> str:
-    """Converts a capitalized str to snake case.
+    """Converts a capitalized `str` to snake case.
 
     Args:
-        item (str): str to convert.
+        item: `str`/. to convert.
 
     Returns:
         str: 'item' converted to snake case.
@@ -151,9 +143,8 @@ def _uniquify(
     will be: "old_name2".
 
     Args:
-        key (str): name of key to test.
-        dictionary (GenericDict): dict for which a unique key name
-            is sought.
+        key: name of key to test.
+        dictionary: `dict` for which a unique key name is sought.
 
     Returns:
         str: unique key name for 'dictionary'.

@@ -1,8 +1,8 @@
 """Base class for extensible, flexible, lightweight collection types.
 
 Contents:
-    Bunch (Collection, abc.ABC): base class for general containers in `bunches`.
-        It requires subclasses to have `add`, `delete`, and `subset` methods.
+    Bunch (Collection, abc.ABC): base class for collections in `bunches`. It
+        requires subclasses to have `add`, `delete`, and `subset` methods.
 
 To Do:
 
