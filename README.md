@@ -63,24 +63,18 @@ pip install bunches
 A `Dictionary` works like a `dict`. Its `add` method updates the stored data, `subset` returns a new `Dictionary`, and `get` falls back on `default_factory` (a value or a callable) when a key is missing.
 
 ```python
->>> from bunches import Dictionary
->>> colors = Dictionary(contents = {'red': 1, 'green': 2}, default_factory = 0)
->>> colors.add({'blue': 3})
->>> colors['blue']
-3
->>> colors.get('purple')
-0
->>> colors.subset(include = ['red', 'blue']).contents
-{'red': 1, 'blue': 3}
->>> colors.subset(exclude = 'red').keys()
-('green', 'blue')
->>> del colors['green']
->>> colors.contents
-{'red': 1, 'blue': 3}
->>> (colors + {'pink': 4}).contents
-{'red': 1, 'blue': 3, 'pink': 4}
->>> colors.contents
-{'red': 1, 'blue': 3}
+from bunches import Dictionary
+
+colors = Dictionary(contents={"red": 1, "green": 2}, default_factory=0)
+colors.add({"blue": 3})
+colors["blue"]  # 3
+colors.get("purple")  # 0
+colors.subset(include=["red", "blue"]).contents  # {'red': 1, 'blue': 3}
+colors.subset(exclude="red").keys()  # ('green', 'blue')
+del colors["green"]
+colors.contents  # {'red': 1, 'blue': 3}
+(colors + {"pink": 4}).contents  # {'red': 1, 'blue': 3, 'pink': 4}
+colors.contents  # {'red': 1, 'blue': 3}
 ```
 
 #### Catalog
@@ -88,19 +82,15 @@ A `Dictionary` works like a `dict`. Its `add` method updates the stored data, `s
 A `Catalog` is meant for storing options. The `all`, `default` and `none` keys are special and a list of keys returns a list of values.
 
 ```python
->>> from bunches import Catalog
->>> models = Catalog(contents = {'tree': 'DecisionTree', 'forest': 'RandomForest'})
->>> models['tree']
-'DecisionTree'
->>> models[['tree', 'forest']]
-['DecisionTree', 'RandomForest']
->>> models['all']
-['DecisionTree', 'RandomForest']
->>> models.default = 'forest'
->>> models['default']
-'RandomForest'
->>> models['none'] is None
-True
+from bunches import Catalog
+
+models = Catalog(contents={"tree": "DecisionTree", "forest": "RandomForest"})
+models["tree"]  # 'DecisionTree'
+models[["tree", "forest"]]  # ['DecisionTree', 'RandomForest']
+models["all"]  # ['DecisionTree', 'RandomForest']
+models.default = "forest"
+models["default"]  # 'RandomForest'
+models["none"] is None  # True
 ```
 
 #### ChainDict
@@ -108,16 +98,14 @@ True
 A `ChainDict` searches its stored dictionaries in order and returns the first match. Set `return_first` to `False` to get every match.
 
 ```python
->>> from bunches import ChainDict, Dictionary
->>> chain = ChainDict(contents = [Dictionary({'a': 1}), Dictionary({'a': 2, 'b': 3})])
->>> chain['a'], chain['b']
-(1, 3)
->>> chain.return_first = False
->>> chain['a']
-[1, 2]
->>> chain.new_child(Dictionary({'c': 4}))
->>> chain.keys()
-('c', 'a', 'a', 'b')
+from bunches import ChainDict, Dictionary
+
+chain = ChainDict(contents=[Dictionary({"a": 1}), Dictionary({"a": 2, "b": 3})])
+chain["a"], chain["b"]  # (1, 3)
+chain.return_first = False
+chain["a"]  # [1, 2]
+chain.new_child(Dictionary({"c": 4}))
+chain.keys()  # ('c', 'a', 'a', 'b')
 ```
 
 #### Repository
@@ -125,20 +113,25 @@ A `ChainDict` searches its stored dictionaries in order and returns the first ma
 A `Repository` infers the key for each item added: the item itself if it is a `str`, its `name` attribute, or the snake-cased name of its class. Unless `overwrite` is `True`, a counter is appended to avoid overwriting existing items.
 
 ```python
->>> from dataclasses import dataclass
->>> from bunches import Repository
->>> @dataclass
-... class Worker:
-...     name: str
->>> class DataLoader:
-...     pass
->>> repository = Repository()
->>> repository.add(Worker('ann'))
->>> repository.add(DataLoader())
->>> repository.add(DataLoader())
->>> repository.add(Worker('bob'), key = 'boss')
->>> repository.keys()
-('ann', 'data_loader', 'data_loader2', 'boss')
+from dataclasses import dataclass
+from bunches import Repository
+
+
+@dataclass
+class Worker:
+    name: str
+
+
+class DataLoader:
+    pass
+
+
+repository = Repository()
+repository.add(Worker("ann"))
+repository.add(DataLoader())
+repository.add(DataLoader())
+repository.add(Worker("bob"), key="boss")
+repository.keys()  # ('ann', 'data_loader', 'data_loader2', 'boss')
 ```
 
 #### Listing
@@ -146,18 +139,16 @@ A `Repository` infers the key for each item added: the item itself if it is a `s
 A `Listing` works like a `list`. `add` extends the list with a sequence and appends anything else, and `prepend` does the same at the beginning.
 
 ```python
->>> from bunches import Listing
->>> letters = Listing(contents = ['b', 'c'])
->>> letters.add('d')
->>> letters.add(['e', 'f'])
->>> letters.prepend('a')
->>> letters.contents
-['a', 'b', 'c', 'd', 'e', 'f']
->>> letters.subset(include = ['a', 'b', 'c'], exclude = 'b').contents
-['a', 'c']
->>> letters.delete(0)
->>> letters[0]
-'b'
+from bunches import Listing
+
+letters = Listing(contents=["b", "c"])
+letters.add("d")
+letters.add(["e", "f"])
+letters.prepend("a")
+letters.contents  # ['a', 'b', 'c', 'd', 'e', 'f']
+letters.subset(include=["a", "b", "c"], exclude="b").contents  # ['a', 'c']
+letters.delete(0)
+letters[0]  # 'b'
 ```
 
 #### DictList
@@ -165,19 +156,15 @@ A `Listing` works like a `list`. `add` extends the list with a sequence and appe
 A `DictList` is a `list` you can also search by name. Items are found by their `name` attribute or, if they have none, by their own value. Duplicate names are allowed; a `DictList` of the matches is returned.
 
 ```python
->>> from bunches import DictList
->>> workers = DictList(contents = [Worker('ann'), Worker('bob'), Worker('ann')])
->>> workers.keys()
-('ann', 'bob', 'ann')
->>> workers['bob']
-Worker(name='bob')
->>> len(workers['ann'])
-2
->>> workers[1]
-Worker(name='bob')
->>> workers.delete('ann')
->>> workers.keys()
-('bob',)
+from bunches import DictList
+
+workers = DictList(contents=[Worker("ann"), Worker("bob"), Worker("ann")])
+workers.keys()  # ('ann', 'bob', 'ann')
+workers["bob"]  # Worker(name='bob')
+len(workers["ann"])  # 2
+workers[1]  # Worker(name='bob')
+workers.delete("ann")
+workers.keys()  # ('bob',)
 ```
 
 #### Choosing what `subset` returns
@@ -185,9 +172,8 @@ Worker(name='bob')
 Every `subset` method has a `returns` argument. `'class'` (the default) returns a new instance of the same class, `'copy'` returns a deep copy of the instance (keeping its other settings) and `'simple'` returns the built-in type. To change the default for the whole package, use `bunches.settings.set_subset_return`.
 
 ```python
->>> colors = Dictionary({'red': 1, 'green': 2})
->>> colors.subset(include = 'red', returns = 'simple')
-{'red': 1}
+colors = Dictionary({"red": 1, "green": 2})
+colors.subset(include="red", returns="simple")  # {'red': 1}
 ```
 
 #### Naming items
@@ -195,12 +181,12 @@ Every `subset` method has a `returns` argument. `'class'` (the default) returns 
 `Repository` and `DictList` name items with a global function that you can replace using `bunches.settings.set_key_namer`.
 
 ```python
->>> from bunches import settings
->>> settings.set_key_namer(lambda item: str(item).upper())
->>> Repository({'a': 1}).add('b')
->>> DictList(['x', 'y']).keys()
-('X', 'Y')
->>> settings.set_key_namer(settings.utilities._namify)
+from bunches import settings
+
+settings.set_key_namer(lambda item: str(item).upper())
+Repository({"a": 1}).add("b")
+DictList(["x", "y"]).keys()  # ('X', 'Y')
+settings.set_key_namer(settings.utilities._namify)
 ```
 
 ## Contributing
