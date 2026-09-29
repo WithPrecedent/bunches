@@ -5,6 +5,7 @@ Contents:
         requires subclasses to have `add`, `delete`, and `subset` methods.
 
 """
+
 from __future__ import annotations
 
 import abc
@@ -58,8 +59,8 @@ class Bunch(Collection, abc.ABC):
 
         Args:
             item: item to add to `contents`.
-            args: positional arguments.
-            kwargs: keyword arguments.
+            *args: positional arguments.
+            **kwargs: keyword arguments.
 
         """
 
@@ -69,8 +70,8 @@ class Bunch(Collection, abc.ABC):
 
         Args:
             item: item or key to delete in `contents`.
-            args: positional arguments.
-            kwargs: keyword arguments.
+            *args: positional arguments.
+            **kwargs: keyword arguments.
 
         Raises:
             KeyError: if `item` is not in `contents`. Subclasses should
@@ -83,7 +84,8 @@ class Bunch(Collection, abc.ABC):
         self,
         include: Collection[Any] | Any | None = None,
         exclude: Collection[Any] | Any | None = None,
-        returns: SubsetReturns | None = None) -> Any:
+        returns: SubsetReturns | None = None,
+    ) -> Any:
         """Returns a new instance with a subset of `contents`.
 
         This method applies `include` before `exclude` if both are passed. If
@@ -117,7 +119,7 @@ class Bunch(Collection, abc.ABC):
 
         """
         new_instance = copy.deepcopy(self)
-        new_instance.add(item = other)
+        new_instance.add(item=other)
         return new_instance
 
     def __iadd__(self, other: Any) -> Self:
@@ -130,7 +132,7 @@ class Bunch(Collection, abc.ABC):
             The instance, modified in place.
 
         """
-        self.add(item = other)
+        self.add(item=other)
         return self
 
     def __delitem__(self, item: Hashable) -> None:
@@ -143,7 +145,7 @@ class Bunch(Collection, abc.ABC):
             KeyError: if `item` is not in `contents`.
 
         """
-        self.delete(item = item)
+        self.delete(item=item)
 
     def __iter__(self) -> Iterator[Any]:
         """Returns iterator of `contents`.

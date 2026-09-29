@@ -15,6 +15,7 @@ Contents:
         provided out of the box based on the `overwrite` argument.
 
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -61,30 +62,28 @@ class Dictionary(base.Bunch, MutableMapping):
 
     """
 
-    contents: GenericDict = dataclasses.field(default_factory = dict)
+    contents: GenericDict = dataclasses.field(default_factory=dict)
     default_factory: Any | None = None
 
     """ Class Methods """
 
     @classmethod
     def fromkeys(
-        cls,
-        keys: GenericList,
-        value: Any,
-        **kwargs: Any) -> Dictionary:
+        cls, keys: GenericList, value: Any, **kwargs: Any
+    ) -> Dictionary:
         """Emulates the `fromkeys` class method from a python `dict`.
 
         Args:
             keys: items to be keys in a new `Dictionary`.
             value: the value to use for all values in a new `Dictionary`.
-            kwargs: additional arguments to pass to the class constructor (e.g.
+            **kwargs: additional arguments to pass to the class constructor (e.g.
                 `default_factory`).
 
         Returns:
             An instance formed from `keys` and `value`.
 
         """
-        return cls(contents = dict.fromkeys(keys, value), **kwargs)
+        return cls(contents=dict.fromkeys(keys, value), **kwargs)
 
     """ Instance Methods """
 
@@ -93,7 +92,7 @@ class Dictionary(base.Bunch, MutableMapping):
 
         Args:
             item: items to add to `contents` attribute.
-            kwargs: additional key/value pairs to add, as in `dict.update`.
+            **kwargs: additional key/value pairs to add, as in `dict.update`.
 
         """
         self.contents.update(item, **kwargs)
@@ -134,7 +133,7 @@ class Dictionary(base.Bunch, MutableMapping):
             if default is not None:
                 return default
             if self.default_factory is None:
-                raise KeyError(f'{key} is not in the Dictionary') from error
+                raise KeyError(f"{key} is not in the Dictionary") from error
             if callable(self.default_factory):
                 return self.default_factory()
             return self.default_factory
@@ -146,7 +145,7 @@ class Dictionary(base.Bunch, MutableMapping):
             A `tuple` equivalent to `dict.items()`.
 
         """
-        return tuple(zip(self.keys(), self.values(), strict = True))
+        return tuple(zip(self.keys(), self.values(), strict=True))
 
     def keys(self) -> tuple[Hashable, ...]:  # type: ignore[override]
         """Returns `contents` keys as a tuple.
@@ -171,7 +170,8 @@ class Dictionary(base.Bunch, MutableMapping):
         self,
         include: Collection[Any] | Any | None = None,
         exclude: Collection[Any] | Any | None = None,
-        returns: SubsetReturns | None = None) -> Any:
+        returns: SubsetReturns | None = None,
+    ) -> Any:
         """Returns a new instance with a subset of `contents`.
 
         This method applies `include` before `exclude` if both are passed. If
@@ -199,7 +199,7 @@ class Dictionary(base.Bunch, MutableMapping):
 
         """
         if include is None and exclude is None:
-            raise ValueError('include or exclude must not be None')
+            raise ValueError("include or exclude must not be None")
         returns = self._resolve_returns(returns)
         if include is None:
             contents = copy.deepcopy(self.contents)
@@ -210,9 +210,8 @@ class Dictionary(base.Bunch, MutableMapping):
             exclude = list(utilities._iterify(exclude))
             contents = {k: v for k, v in contents.items() if k not in exclude}
         return utilities._return_subset(
-            subset = contents,
-            existing = self,
-            returns = returns)
+            subset=contents, existing=self, returns=returns
+        )
 
     def values(self) -> tuple[Any, ...]:  # type: ignore[override]
         """Returns `contents` values as a `tuple`.
@@ -289,9 +288,9 @@ class Catalog(Dictionary):
 
     """
 
-    contents: GenericDict = dataclasses.field(default_factory = dict)
+    contents: GenericDict = dataclasses.field(default_factory=dict)
     default_factory: Any | None = None
-    default: Any | None = 'all'
+    default: Any | None = "all"
     always_return_list: bool = False
 
     """ Instance Methods """
@@ -309,15 +308,15 @@ class Catalog(Dictionary):
         """
         keys = list(utilities._iterify(item))
         if not all(k in self.contents for k in keys):
-            raise KeyError(f'{item} not found in the Catalog')
+            raise KeyError(f"{item} not found in the Catalog")
         for key in keys:
             del self.contents[key]
 
     """ Dunder Methods """
 
     def __getitem__(
-        self,
-        key: Hashable | Sequence[Hashable]) -> Any | GenericList:
+        self, key: Hashable | Sequence[Hashable]
+    ) -> Any | GenericList:
         """Returns value(s) for `key` in `contents`.
 
         The method searches for 'all', 'default', and 'none' matching wildcard
@@ -350,13 +349,12 @@ class Catalog(Dictionary):
                 return [self.contents[key]]
             return self.contents[key]
         except KeyError as error:
-            message = f'{key} is not in {self.__class__.__name__}'
+            message = f"{key} is not in {self.__class__.__name__}"
             raise KeyError(message) from error
 
     def __setitem__(
-        self,
-        key: Hashable | Sequence[Hashable],
-        value: Any | GenericList) -> None:
+        self, key: Hashable | Sequence[Hashable], value: Any | GenericList
+    ) -> None:
         """Sets `key` in `contents` to `value`.
 
         If `key` is unhashable (e.g., a `list` of keys), `key` and `value` are
@@ -374,7 +372,7 @@ class Catalog(Dictionary):
         try:
             self.contents[key] = value
         except TypeError:
-            self.contents.update(dict(zip(key, value, strict = True)))  # type: ignore[arg-type]
+            self.contents.update(dict(zip(key, value, strict=True)))  # type: ignore[arg-type]
 
 
 @dataclasses.dataclass
@@ -401,7 +399,8 @@ class ChainDict(Dictionary):
     """
 
     contents: MutableSequence[Dictionary] = dataclasses.field(  # type: ignore[assignment]
-        default_factory = list)
+        default_factory=list
+    )
     default_factory: Any | None = None
     return_first: bool | None = True
 
@@ -436,10 +435,8 @@ class ChainDict(Dictionary):
 
     @classmethod
     def fromkeys(
-        cls,
-        keys: GenericList,
-        value: Any,
-        **kwargs: Any) -> ChainDict:
+        cls, keys: GenericList, value: Any, **kwargs: Any
+    ) -> ChainDict:
         """Emulates the `fromkeys` class method from a python `dict`.
 
         Since this method is an awkward fit with a chained map, it just assigns
@@ -449,7 +446,7 @@ class ChainDict(Dictionary):
         Args:
             keys: items to be keys in a new `Dictionary`.
             value: the value to use for all values in a new `Dictionary`.
-            kwargs: additional arguments to pass to the `Dictionary`
+            **kwargs: additional arguments to pass to the `Dictionary`
                 constructor (e.g. `default_factory`).
 
         Returns:
@@ -457,7 +454,7 @@ class ChainDict(Dictionary):
                 `value`.
 
         """
-        return cls(contents = [Dictionary.fromkeys(keys, value, **kwargs)])
+        return cls(contents=[Dictionary.fromkeys(keys, value, **kwargs)])
 
     """ Instance Methods """
 
@@ -467,7 +464,7 @@ class ChainDict(Dictionary):
         Args:
             item: mapping to add to `contents`. If it is not a `Dictionary`, it
                 is wrapped in one.
-            kwargs: additional key/value pairs to add to the new mapping.
+            **kwargs: additional key/value pairs to add to the new mapping.
 
         """
         if not isinstance(item, Dictionary):
@@ -496,7 +493,7 @@ class ChainDict(Dictionary):
                 del dictionary[item]
                 found = True
         if not found:
-            raise KeyError(f'{item} is not found in the ChainDict')
+            raise KeyError(f"{item} is not found in the ChainDict")
 
     def keys(self) -> tuple[Hashable, ...]:  # type: ignore[override]
         """Returns `contents` keys as a `tuple`.
@@ -507,7 +504,8 @@ class ChainDict(Dictionary):
 
         """
         return tuple(
-            itertools.chain.from_iterable([d.keys() for d in self.contents]))
+            itertools.chain.from_iterable([d.keys() for d in self.contents])
+        )
 
     def new_child(self, m: Dictionary) -> None:
         """Inserts `m` as the first Dictionary in `contents`.
@@ -533,14 +531,16 @@ class ChainDict(Dictionary):
         """
         return self.__class__(
             self.contents[1:],
-            default_factory = self.default_factory,
-            return_first = self.return_first)
+            default_factory=self.default_factory,
+            return_first=self.return_first,
+        )
 
     def subset(
         self,
         include: Collection[Any] | Any | None = None,
         exclude: Collection[Any] | Any | None = None,
-        returns: SubsetReturns | None = None) -> Any:
+        returns: SubsetReturns | None = None,
+    ) -> Any:
         """Returns a new instance with a subset of `contents`.
 
         This method applies `include` before `exclude` if both are passed. If
@@ -572,7 +572,7 @@ class ChainDict(Dictionary):
 
         """
         if include is None and exclude is None:
-            raise ValueError('include or exclude must not be None')
+            raise ValueError("include or exclude must not be None")
         returns = self._resolve_returns(returns)
         if include is not None:
             include = list(utilities._iterify(include))
@@ -584,13 +584,12 @@ class ChainDict(Dictionary):
                 these_keys = [k for k in include if k in dictionary]
             new_contents.append(
                 dictionary.subset(
-                    include = these_keys,
-                    exclude = exclude,
-                    returns = 'class'))
+                    include=these_keys, exclude=exclude, returns="class"
+                )
+            )
         return utilities._return_subset(
-            subset = new_contents,
-            existing = self,
-            returns = returns)
+            subset=new_contents, existing=self, returns=returns
+        )
 
     def values(self) -> tuple[Any, ...]:  # type: ignore[override]
         """Returns `contents` values as a `tuple`.
@@ -601,7 +600,8 @@ class ChainDict(Dictionary):
 
         """
         return tuple(
-            itertools.chain.from_iterable([d.values() for d in self.contents]))
+            itertools.chain.from_iterable([d.values() for d in self.contents])
+        )
 
     """ Dunder Methods """
 
@@ -629,7 +629,7 @@ class ChainDict(Dictionary):
                 if self.return_first:
                     return matches[0]
         if not matches:
-            raise KeyError(f'{key} is not found in the ChainDict')
+            raise KeyError(f"{key} is not found in the ChainDict")
         return matches if len(matches) > 1 else matches[0]
 
     def __iter__(self) -> Iterator[Hashable]:
@@ -691,29 +691,25 @@ class Repository(Dictionary):
 
     """
 
-    contents: GenericDict = dataclasses.field(default_factory = dict)
+    contents: GenericDict = dataclasses.field(default_factory=dict)
     default_factory: Any | None = None
     overwrite: bool | None = False
 
     """ Instance Methods """
 
-    def add(
-        self,
-        item: Any,
-        key: str | None = None,
-        **kwargs: Any) -> None:
+    def add(self, item: Any, key: str | None = None, **kwargs: Any) -> None:
         """Adds `item` to the `contents` attribute.
 
         Args:
             item: item to add to `contents` attribute.
             key: key to use for `item` if the user does not want the key to be
                 inferred.
-            kwargs: additional key/value pairs to add, as in `dict.update`.
+            **kwargs: additional key/value pairs to add, as in `dict.update`.
 
         """
-        key = key or self._get_name(item = item)
+        key = key or self._get_name(item=item)
         if not self.overwrite:
-            key = utilities._uniquify(key = key, dictionary = self)
+            key = utilities._uniquify(key=key, dictionary=self)
         self.contents.update({key: item}, **kwargs)
 
     """ Private Methods """

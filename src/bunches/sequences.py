@@ -7,6 +7,7 @@ Contents:
         items must be hashable or have a `name` attribute.
 
 """
+
 from __future__ import annotations
 
 import copy
@@ -39,7 +40,7 @@ class Listing(base.Bunch, MutableSequence):
 
     """
 
-    contents: GenericList = dataclasses.field(default_factory = list)
+    contents: GenericList = dataclasses.field(default_factory=list)
 
     """ Instance Methods """
 
@@ -53,7 +54,7 @@ class Listing(base.Bunch, MutableSequence):
             item: item(s) to add to `contents`.
 
         """
-        if utilities._is_sequence(item = item):
+        if utilities._is_sequence(item=item):
             self.contents.extend(item)
         else:
             self.contents.append(item)
@@ -90,7 +91,7 @@ class Listing(base.Bunch, MutableSequence):
             item: item(s) to prepend to `contents`.
 
         """
-        if utilities._is_sequence(item = item):
+        if utilities._is_sequence(item=item):
             self.contents[:0] = list(item)
         else:
             self.insert(0, item)
@@ -99,7 +100,8 @@ class Listing(base.Bunch, MutableSequence):
         self,
         include: Any | GenericList | None = None,
         exclude: Any | GenericList | None = None,
-        returns: SubsetReturns | None = None) -> Any:
+        returns: SubsetReturns | None = None,
+    ) -> Any:
         """Returns a new instance with a subset of `contents`.
 
         This method applies `include` before `exclude` if both are passed. If
@@ -123,7 +125,7 @@ class Listing(base.Bunch, MutableSequence):
 
         """
         if include is None and exclude is None:
-            raise ValueError('include or exclude must not be None')
+            raise ValueError("include or exclude must not be None")
         returns = self._resolve_returns(returns)
         if include is None:
             contents = copy.deepcopy(self.contents)
@@ -134,9 +136,8 @@ class Listing(base.Bunch, MutableSequence):
             exclude = list(utilities._iterify(exclude))
             contents = [i for i in contents if i not in exclude]
         return utilities._return_subset(
-            subset = contents,
-            existing = self,
-            returns = returns)
+            subset=contents, existing=self, returns=returns
+        )
 
     """ Dunder Methods """
 
@@ -207,7 +208,8 @@ class DictList(Listing):
     """
 
     contents: MutableSequence[Hashable] = dataclasses.field(
-        default_factory = list)
+        default_factory=list
+    )
     default_factory: Any | None = None
 
     """ Instance Methods """
@@ -232,7 +234,7 @@ class DictList(Listing):
             namer = settings._KEY_NAMER
             remaining = [c for c in self.contents if namer(c) != item]
             if len(remaining) == len(self.contents):
-                raise KeyError(f'{item} is not in {self.__class__.__name__}')
+                raise KeyError(f"{item} is not in {self.__class__.__name__}")
             self.contents[:] = remaining
 
     def get(self, key: Hashable, default: Any | None = None) -> Any:
@@ -258,7 +260,7 @@ class DictList(Listing):
             if default is not None:
                 return default
             if self.default_factory is None:
-                raise KeyError(f'{key} is not in the DictList') from error
+                raise KeyError(f"{key} is not in the DictList") from error
             if callable(self.default_factory):
                 return self.default_factory()
             return self.default_factory
@@ -272,7 +274,7 @@ class DictList(Listing):
                 eliminate any duplicate keys, which are permitted by DictList.
 
         """
-        return tuple(zip(self.keys(), self.values(), strict = True))
+        return tuple(zip(self.keys(), self.values(), strict=True))
 
     def keys(self) -> tuple[Hashable, ...]:
         """Emulates python dict `keys` method.
@@ -353,12 +355,12 @@ class DictList(Listing):
         namer = settings._KEY_NAMER
         matches = [c for c in self.contents if namer(c) == key]
         if not matches:
-            raise KeyError(f'{key} is not in {self.__class__.__name__}')
+            raise KeyError(f"{key} is not in {self.__class__.__name__}")
         if len(matches) == 1:
             return matches[0]
         return self.__class__(
-            contents = matches,
-            default_factory = self.default_factory)
+            contents=matches, default_factory=self.default_factory
+        )
 
     def __setitem__(self, key: Any | int | slice, value: Any) -> None:
         """Sets `key` in `contents` to `value`.

@@ -13,9 +13,9 @@ Contents:
 
 from __future__ import annotations
 
-__version__ = '0.2.0'
+__version__ = "0.2.0"
 
-__author__: str = 'Corey Rayburn Yung'
+__author__: str = "Corey Rayburn Yung"
 
 
 from .base import Bunch

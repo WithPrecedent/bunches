@@ -10,6 +10,7 @@ Contents:
     _MISSING: sentinel for missing values, used as an alternative to `None`.
 
 """
+
 from __future__ import annotations
 
 import dataclasses
@@ -20,7 +21,7 @@ from typing import Any, Literal, TypeAlias
 GenericDict: TypeAlias = MutableMapping[Hashable, Any]
 GenericList: TypeAlias = MutableSequence[Any]
 GenericSet: TypeAlias = AbstractSet[Any]
-SubsetReturns: TypeAlias = Literal['class', 'copy', 'simple']
+SubsetReturns: TypeAlias = Literal["class", "copy", "simple"]
 
 
 @dataclasses.dataclass
