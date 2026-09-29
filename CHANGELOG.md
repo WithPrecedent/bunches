@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 <!-- insertion marker -->
 
+## 0.2.1
+
+    * Fixed CI: applied pre-commit formatting, configured `pydoclint`, fixed `dependabot`
+    * README examples now show results as comments instead of `>>>` prompts
+
 ## 0.2.0
 
     * Updated to the latest `snickerdoodle` template: `uv` and `hatchling` replace `pdm`, new GitHub Actions, pre-commit, codecov, and mkdocs configuration
