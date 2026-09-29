@@ -1,30 +1,26 @@
 """Types and type aliases for the package.
 
 Contents:
-
-
-To Do:
-
+    GenericDict: type alias for any mutable mapping with hashable keys.
+    GenericList: type alias for any mutable sequence.
+    GenericSet: type alias for any set.
+    SubsetReturns: type alias for the options of the `returns` argument of
+        `subset` methods.
+    _MISSING_VALUE: type of the sentinel for missing values.
+    _MISSING: sentinel for missing values, used as an alternative to `None`.
 
 """
 from __future__ import annotations
 
 import dataclasses
-import sys
 from collections.abc import Hashable, MutableMapping, MutableSequence
 from collections.abc import Set as AbstractSet
 from typing import Any, Literal, TypeAlias
 
-if sys.version_info < (3, 12):
-    GenericDict: TypeAlias = MutableMapping[Hashable, Any]
-    GenericList: TypeAlias = MutableSequence[Any]
-    GenericSet: TypeAlias = AbstractSet[Any]
-    SubsetReturns: TypeAlias = Literal['class', 'copy', 'simple']
-else:
-    type GenericDict = MutableMapping[Hashable, Any]
-    type GenericList = MutableSequence[Any]
-    type GenericSet = AbstractSet[Any]
-    type SubsetReturns = Literal['class', 'copy', 'simple']
+GenericDict: TypeAlias = MutableMapping[Hashable, Any]
+GenericList: TypeAlias = MutableSequence[Any]
+GenericSet: TypeAlias = AbstractSet[Any]
+SubsetReturns: TypeAlias = Literal['class', 'copy', 'simple']
 
 
 @dataclasses.dataclass
@@ -33,7 +29,7 @@ class _MISSING_VALUE:  # noqa: N801
 
     This follows the same pattern as the `_MISSING_TYPE` class in the builtin
     dataclasses library.
-    https://github.com/python/cpython/blob/3.10/Lib/dataclasses.py#L182-L186
+    https://github.com/python/cpython/blob/3.11/Lib/dataclasses.py
 
     Because None is sometimes a valid argument or data option, this class
     provides an alternative that does not create the confusion that a default of

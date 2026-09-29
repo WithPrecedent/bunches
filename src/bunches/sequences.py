@@ -6,9 +6,6 @@ Contents:
     DictList (Listing): iterable with both `dict` and `list` interfaces. Stored
         items must be hashable or have a `name` attribute.
 
-To Do:
-
-
 """
 from __future__ import annotations
 
@@ -17,10 +14,10 @@ import dataclasses
 from collections.abc import Hashable, Mapping, MutableSequence
 from typing import TYPE_CHECKING, Any
 
-from . import base, utilities
+from . import base, settings, utilities
 
 if TYPE_CHECKING:
-    from .kinds import GenericList
+    from .kinds import GenericList, SubsetReturns
 
 
 @dataclasses.dataclass
@@ -35,7 +32,7 @@ class Listing(base.Bunch, MutableSequence):
             beginning of the stored list.
 
     The `add` method attempts to extend `contents` with the item to be added.
-    If this fails, it appends the item to `contents`.
+    If it is not a sequence, it appends the item to `contents`.
 
     Args:
         contents: items to store in a `list`. Defaults to an empty `list`.
@@ -47,10 +44,10 @@ class Listing(base.Bunch, MutableSequence):
     """ Instance Methods """
 
     def add(self, item: Any | GenericList) -> None:
-        """Tries to extend `contents` with `item`. Otherwise, it appends.
+        """Extends `contents` with `item` if it is a sequence. Otherwise appends.
 
-        The method will extend all passed sequences, except str types, which it
-        will append.
+        The method will extend all passed sequences, except `str` and `bytes`
+        types, which it will append.
 
         Args:
             item: item(s) to add to `contents`.
@@ -60,17 +57,18 @@ class Listing(base.Bunch, MutableSequence):
             self.contents.extend(item)
         else:
             self.contents.append(item)
-        return
 
-    def delete(self, item: int) -> None:
+    def delete(self, item: int | slice) -> None:
         """Deletes item at the index in `contents`.
 
         Args:
-            item: index in `contents` to delete.
+            item: index (or slice) in `contents` to delete.
+
+        Raises:
+            IndexError: if `item` is out of range.
 
         """
         del self.contents[item]
-        return
 
     def insert(self, index: int, item: Any) -> None:
         """Inserts `item` at `index` in `contents`.
@@ -81,29 +79,27 @@ class Listing(base.Bunch, MutableSequence):
 
         """
         self.contents.insert(index, item)
-        return
 
     def prepend(self, item: Any | GenericList) -> None:
         """Prepends `item` to `contents`.
 
         If `item` is a non-str sequence, `prepend` adds its contents to the
-        stored list in the order they appear in `item`.
+        beginning of the stored list in the order they appear in `item`.
 
         Args:
             item: item(s) to prepend to `contents`.
 
         """
         if utilities._is_sequence(item = item):
-            for thing in reversed(item):
-                self.prepend(item = thing)
+            self.contents[:0] = list(item)
         else:
             self.insert(0, item)
-        return
 
     def subset(
         self,
         include: Any | GenericList | None = None,
-        exclude: Any | GenericList | None = None) -> Listing:
+        exclude: Any | GenericList | None = None,
+        returns: SubsetReturns | None = None) -> Any:
         """Returns a new instance with a subset of `contents`.
 
         This method applies `include` before `exclude` if both are passed. If
@@ -111,20 +107,24 @@ class Listing(base.Bunch, MutableSequence):
         class instance before `exclude` is applied.
 
         Args:
-            include (Optional[Any | GenericList]): item(s) to include in
-                the new instance. Defaults to None.
-            exclude (Optional[Any | GenericList]): item(s) to exclude in
-                the new instance. Defaults to None.
+            include: item(s) to include in the new instance. Defaults to `None`.
+            exclude: item(s) to exclude in the new instance. Defaults to `None`.
+            returns: whether to return a new instance of the `Listing` subclass
+                ("class"), a deep copy of the subclass instance ("copy") or the
+                simple native Python type ("simple"). Defaults to `None`, which
+                uses the global setting stored in `settings._SUBSET_RETURN`.
 
         Raises:
             ValueError: if `include` and `exclude` are both None.
 
         Returns:
-            Listing: with only items from `include` and no items in `exclude`.
+            Instance with only items from `include` and no items in `exclude`,
+                in the form dictated by the `returns` argument.
 
         """
         if include is None and exclude is None:
             raise ValueError('include or exclude must not be None')
+        returns = self._resolve_returns(returns)
         if include is None:
             contents = copy.deepcopy(self.contents)
         else:
@@ -133,34 +133,34 @@ class Listing(base.Bunch, MutableSequence):
         if exclude is not None:
             exclude = list(utilities._iterify(exclude))
             contents = [i for i in contents if i not in exclude]
-        new_listing = copy.deepcopy(self)
-        new_listing.contents = contents
-        return new_listing
+        return utilities._return_subset(
+            subset = contents,
+            existing = self,
+            returns = returns)
 
     """ Dunder Methods """
 
     def __getitem__(self, index: Any) -> Any:
-        """Returns value(s) for `key` in `contents`.
+        """Returns value(s) for `index` in `contents`.
 
         Args:
-            index (Any): index to search for in `contents`.
+            index: index (or slice) to search for in `contents`.
 
         Returns:
-            Any: item stored in `contents` at key.
+            Item(s) stored in `contents` at `index`.
 
         """
         return self.contents[index]
 
     def __setitem__(self, index: Any, value: Any) -> None:
-        """Sets `key` in `contents` to `value`.
+        """Sets `index` in `contents` to `value`.
 
         Args:
-            index (Any): index to set `value` to in `contents`.
-            value (Any): value to be set at `key` in `contents`.
+            index: index (or slice) to set `value` to in `contents`.
+            value: value to be set at `index` in `contents`.
 
         """
         self.contents[index] = value
-        return
 
 
 @dataclasses.dataclass
@@ -176,9 +176,9 @@ class DictList(Listing):
     A DictList inherits the differences between a Listing and an ordinary python
     list.
 
-    A DictList differs from a Listing in 3 significant ways:
+    A DictList differs from a Listing in 4 significant ways:
         1) It only stores hashable items or objects for which a str name can be
-            derived (using the namify function).
+            derived (using the global key namer in `settings._KEY_NAMER`).
         2) DictList has an interface of both a dict and a list, but stores a list.
             DictList does this by taking advantage of the `name` attribute or
             hashability of stored items. A `name` or hash acts as a key to
@@ -195,14 +195,14 @@ class DictList(Listing):
             uncertainty as to whether an index or item should be returned. By
             design, int types are assumed to be calls to return the item at that
             index.
-        4) When using dict access methods, a list of matches may be returned
-            because a DictList allows duplicate pseudo-keys to be used.
+        4) When using dict access methods, a `DictList` of matches may be
+            returned because a DictList allows duplicate pseudo-keys to be used.
 
     Args:
-        contents (MutableSequence[Hashable]): items to store that are hashable
-            or have a `name` attribute. Defaults to an empty list.
-        default_factory (Optional[Any]): default value to return or default
-            function to call when the `get` method is used. Defaults to None.
+        contents: items to store that are hashable or have a `name` attribute.
+            Defaults to an empty list.
+        default_factory: default value to return or default function to call
+            when the `get` method is used. Defaults to `None`.
 
     """
 
@@ -212,60 +212,64 @@ class DictList(Listing):
 
     """ Instance Methods """
 
-    def delete(self, item: Any | int) -> None:
+    def delete(self, item: Any | int | slice) -> None:
         """Deletes item in `contents`.
 
         If `item` is not an int type, this method looks for a matching `name`
-        attribute in the stored instances and deletes all such items. If `key`
+        attribute in the stored instances and deletes all such items. If `item`
         is an int type, only the item at that index is deleted.
 
         Args:
-            item (Any, int): name or index in `contents` to delete.
+            item: name or index in `contents` to delete.
+
+        Raises:
+            KeyError: if `item` is not an int and no stored item matches it.
 
         """
-        if isinstance(item, int):
+        if isinstance(item, int | slice):
             del self.contents[item]
         else:
-            self.contents = [
-                c for c in self.contents if utilities._namify(c) != item]
-        return
+            namer = settings._KEY_NAMER
+            remaining = [c for c in self.contents if namer(c) != item]
+            if len(remaining) == len(self.contents):
+                raise KeyError(f'{item} is not in {self.__class__.__name__}')
+            self.contents[:] = remaining
 
     def get(self, key: Hashable, default: Any | None = None) -> Any:
         """Returns value in `contents` or default options.
 
         Args:
-            key (Hashable): key for value in `contents`.
-            default (Optional[Any]): default value to return if `key` is not
-                found in `contents`.
+            key: name or index for value in `contents`.
+            default: default value to return if `key` is not found in
+                `contents`.
 
         Raises:
             KeyError: if `key` is not in the DictList and `default` and the
                 `default_factory` attribute are both None.
 
         Returns:
-            Any: value matching key in `contents` or `default_factory` value.
+            Value matching key in `contents`, `default`, or the
+                `default_factory` value (called if it is callable).
 
         """
         try:
             return self[key]
-        except (KeyError, TypeError) as error:
+        except (KeyError, IndexError, TypeError) as error:
             if default is not None:
                 return default
             if self.default_factory is None:
                 raise KeyError(f'{key} is not in the DictList') from error
-            try:
+            if callable(self.default_factory):
                 return self.default_factory()
-            except TypeError:
-                return self.default_factory
+            return self.default_factory
 
-    def items(self) -> tuple[tuple[Hashable, ...], tuple[Any, ...]]:
+    def items(self) -> tuple[tuple[Hashable, Any], ...]:
         """Emulates python dict `items` method.
 
         Returns:
-            tuple[tuple[Hashable, ...], tuple[Any, ...]]: a tuple equivalent to
-                dict.items(). A DictList cannot actually create an ItemsView
-                because that would eliminate any duplicate keys, which are
-                permitted by DictList.
+            A tuple of (key, value) pairs equivalent to `dict.items()`. A
+                DictList cannot actually create an ItemsView because that would
+                eliminate any duplicate keys, which are permitted by DictList.
 
         """
         return tuple(zip(self.keys(), self.values(), strict = True))
@@ -274,99 +278,101 @@ class DictList(Listing):
         """Emulates python dict `keys` method.
 
         Returns:
-            tuple[Hashable, ...]: a tuple equivalent to dict.keys(). A DictList
-                cannot actually create an KeysView because that would eliminate
-                any duplicate keys, which are permitted by DictList.
+            A tuple equivalent to dict.keys(). A DictList cannot actually
+                create a KeysView because that would eliminate any duplicate
+                keys, which are permitted by DictList.
 
         """
-        return tuple(utilities._namify(c) for c in self.contents)
+        namer = settings._KEY_NAMER
+        return tuple(namer(c) for c in self.contents)
 
     def setdefault(self, value: Any) -> None:
         """Sets default value to return when `get` method is used.
 
         Args:
-            value (Any): default value to return.
+            value: default value to return.
 
         """
         self.default_factory = value
-        return
 
     def update(self, items: Mapping[Any, Any]) -> None:
         """Mimics the dict `update` method by extending `contents` with `items`.
 
         Args:
-            items (Mapping[Any, Any]): items to add to the `contents` attribute.
-                The values of `items` are added to `contents` and the keys
-                become the `name` attributes of those values. As a result, the
-                keys of `items` are discarded. To mimic `dict.update`, the
-                passed `items` values are added to `contents` by the `extend`
-                method which adds the values to the end of `contents`.
+            items: items to add to the `contents` attribute. The values of
+                `items` are added to `contents` and the keys become the `name`
+                attributes of those values. As a result, the keys of `items`
+                are discarded. To mimic `dict.update`, the passed `items`
+                values are added to `contents` by the `extend` method which
+                adds the values to the end of `contents`.
 
         """
         self.extend(list(items.values()))
-        return
 
     def values(self) -> tuple[Any, ...]:
         """Emulates python dict `values` method.
 
         Returns:
-            tuple[Any, ...]: a tuple equivalent to dict.values(). A DictList
-                cannot actually create an ValuesView because that would
-                eliminate any duplicate keys, which are permitted by DictList.
+            A tuple equivalent to dict.values(). A DictList cannot actually
+                create a ValuesView because that would eliminate any duplicate
+                keys, which are permitted by DictList.
 
         """
         return tuple(self.contents)
 
     """ Dunder Methods """
 
-    def __getitem__(self, key: Hashable | int) -> Any:
+    def __getitem__(self, key: Hashable | int | slice) -> Any:
         """Returns value(s) for `key` in `contents`.
 
         If `key` is not an int type, this method looks for a matching `name`
         attribute in the stored instances.
 
-        If `key` is an int type, this method returns the stored item at the
-        corresponding index.
+        If `key` is an int (or a slice), this method returns the stored item(s)
+        at the corresponding index.
 
         If only one match is found, a single item is returned. If more are
-        found, a `DictList` or `DictList` subclass with the matching `name`
-        attributes is returned.
+        found, a `DictList` or `DictList` subclass with the matching stored
+        items is returned.
 
         Args:
-            key (Hashable, int): name of an item or index to search for
-                in `contents`.
+            key: name of an item or index to search for in `contents`.
+
+        Raises:
+            KeyError: if `key` is not an int or slice and no item matches it.
+            IndexError: if `key` is an int outside of the range of `contents`.
 
         Returns:
-            Any: value(s) stored in `contents` that correspond to `key`. If
-                there is more than one match, the return is a DictList or DictList
-                subclass with that matching stored items.
+            Value(s) stored in `contents` that correspond to `key`. If there is
+                more than one match, the return is a DictList or DictList
+                subclass with the matching stored items.
 
         """
-        if isinstance(key, int):
+        if isinstance(key, int | slice):
             return self.contents[key]
-        matches = [
-            c for c in self.contents if utilities._namify(c) == key]
+        namer = settings._KEY_NAMER
+        matches = [c for c in self.contents if namer(c) == key]
         if not matches:
             raise KeyError(f'{key} is not in {self.__class__.__name__}')
         if len(matches) == 1:
             return matches[0]
-        else:
-            return matches
+        return self.__class__(
+            contents = matches,
+            default_factory = self.default_factory)
 
-    def __setitem__(self, key: Any | int, value: Any) -> None:
+    def __setitem__(self, key: Any | int | slice, value: Any) -> None:
         """Sets `key` in `contents` to `value`.
 
         Args:
-            key (Any | int): if key isn`t an int, it is ignored (since the
-                `name` attribute of the value will be acting as the key). In
-                such a case, the `value` is added to the end of `contents`. If
-                key is an int, `value` is assigned at the that index number in
+            key: if key isn't an int or slice, it is ignored (since the `name`
+                attribute of the value will be acting as the key). In such a
+                case, the `value` is added to the end of `contents`. If key is
+                an int, `value` is assigned at the that index number in
                 `contents`.
-            value (Any): value to be paired with `key` in `contents`.
+            value: value to be paired with `key` in `contents`.
 
         """
-        if isinstance(key, int):
+        if isinstance(key, int | slice):
             self.contents[key] = value
         else:
             self.add(value)
-        return

@@ -22,7 +22,6 @@ nav:
 - Home:
   - Overview: index.md
   - Changelog: changelog.md
-  - Credits: credits.md
   - License: license.md
 - User Guide:
   - Tutorial: tutorial.md
@@ -94,8 +93,8 @@ markdown_extensions:
 - md_in_html
 - pymdownx.details
 - pymdownx.emoji:
-    emoji_index: !!python/name:materialx.emoji.twemoji
-    emoji_generator: !!python/name:materialx.emoji.to_svg
+    emoji_index: !!python/name:material.extensions.emoji.twemoji
+    emoji_generator: !!python/name:material.extensions.emoji.to_svg
 - pymdownx.highlight:
     anchor_linenums: true
     line_spans: __span
@@ -135,8 +134,6 @@ plugins:
 - mkdocstrings:
     handlers:
       python:
-        import:
-        - https://docs.python.org/3/objects.inv
         options:
           docstring_section_style: table
           filters:
