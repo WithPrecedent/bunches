@@ -13,9 +13,9 @@ Contents:
 
 from __future__ import annotations
 
-__version__ = "0.2.1"
+__version__ = '0.2.1'
 
-__author__: str = "Corey Rayburn Yung"
+__author__: str = 'Corey Rayburn Yung'
 
 
 from .base import Bunch
@@ -23,11 +23,11 @@ from .mappings import Catalog, ChainDict, Dictionary, Repository
 from .sequences import DictList, Listing
 
 __all__: list[str] = [
-    "Bunch",
-    "Catalog",
-    "ChainDict",
-    "DictList",
-    "Dictionary",
-    "Listing",
-    "Repository",
+    'Bunch',
+    'Catalog',
+    'ChainDict',
+    'DictList',
+    'Dictionary',
+    'Listing',
+    'Repository',
 ]

@@ -21,7 +21,7 @@ from typing import Any, Literal, TypeAlias
 GenericDict: TypeAlias = MutableMapping[Hashable, Any]
 GenericList: TypeAlias = MutableSequence[Any]
 GenericSet: TypeAlias = AbstractSet[Any]
-SubsetReturns: TypeAlias = Literal["class", "copy", "simple"]
+SubsetReturns: TypeAlias = Literal['class', 'copy', 'simple']
 
 
 @dataclasses.dataclass

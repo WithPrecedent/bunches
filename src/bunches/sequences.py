@@ -125,7 +125,7 @@ class Listing(base.Bunch, MutableSequence):
 
         """
         if include is None and exclude is None:
-            raise ValueError("include or exclude must not be None")
+            raise ValueError('include or exclude must not be None')
         returns = self._resolve_returns(returns)
         if include is None:
             contents = copy.deepcopy(self.contents)
@@ -234,7 +234,7 @@ class DictList(Listing):
             namer = settings._KEY_NAMER
             remaining = [c for c in self.contents if namer(c) != item]
             if len(remaining) == len(self.contents):
-                raise KeyError(f"{item} is not in {self.__class__.__name__}")
+                raise KeyError(f'{item} is not in {self.__class__.__name__}')
             self.contents[:] = remaining
 
     def get(self, key: Hashable, default: Any | None = None) -> Any:
@@ -260,7 +260,7 @@ class DictList(Listing):
             if default is not None:
                 return default
             if self.default_factory is None:
-                raise KeyError(f"{key} is not in the DictList") from error
+                raise KeyError(f'{key} is not in the DictList') from error
             if callable(self.default_factory):
                 return self.default_factory()
             return self.default_factory
@@ -355,7 +355,7 @@ class DictList(Listing):
         namer = settings._KEY_NAMER
         matches = [c for c in self.contents if namer(c) == key]
         if not matches:
-            raise KeyError(f"{key} is not in {self.__class__.__name__}")
+            raise KeyError(f'{key} is not in {self.__class__.__name__}')
         if len(matches) == 1:
             return matches[0]
         return self.__class__(

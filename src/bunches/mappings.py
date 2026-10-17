@@ -133,7 +133,7 @@ class Dictionary(base.Bunch, MutableMapping):
             if default is not None:
                 return default
             if self.default_factory is None:
-                raise KeyError(f"{key} is not in the Dictionary") from error
+                raise KeyError(f'{key} is not in the Dictionary') from error
             if callable(self.default_factory):
                 return self.default_factory()
             return self.default_factory
@@ -199,7 +199,7 @@ class Dictionary(base.Bunch, MutableMapping):
 
         """
         if include is None and exclude is None:
-            raise ValueError("include or exclude must not be None")
+            raise ValueError('include or exclude must not be None')
         returns = self._resolve_returns(returns)
         if include is None:
             contents = copy.deepcopy(self.contents)
@@ -290,7 +290,7 @@ class Catalog(Dictionary):
 
     contents: GenericDict = dataclasses.field(default_factory=dict)
     default_factory: Any | None = None
-    default: Any | None = "all"
+    default: Any | None = 'all'
     always_return_list: bool = False
 
     """ Instance Methods """
@@ -308,7 +308,7 @@ class Catalog(Dictionary):
         """
         keys = list(utilities._iterify(item))
         if not all(k in self.contents for k in keys):
-            raise KeyError(f"{item} not found in the Catalog")
+            raise KeyError(f'{item} not found in the Catalog')
         for key in keys:
             del self.contents[key]
 
@@ -349,7 +349,7 @@ class Catalog(Dictionary):
                 return [self.contents[key]]
             return self.contents[key]
         except KeyError as error:
-            message = f"{key} is not in {self.__class__.__name__}"
+            message = f'{key} is not in {self.__class__.__name__}'
             raise KeyError(message) from error
 
     def __setitem__(
@@ -493,7 +493,7 @@ class ChainDict(Dictionary):
                 del dictionary[item]
                 found = True
         if not found:
-            raise KeyError(f"{item} is not found in the ChainDict")
+            raise KeyError(f'{item} is not found in the ChainDict')
 
     def keys(self) -> tuple[Hashable, ...]:  # type: ignore[override]
         """Returns `contents` keys as a `tuple`.
@@ -572,7 +572,7 @@ class ChainDict(Dictionary):
 
         """
         if include is None and exclude is None:
-            raise ValueError("include or exclude must not be None")
+            raise ValueError('include or exclude must not be None')
         returns = self._resolve_returns(returns)
         if include is not None:
             include = list(utilities._iterify(include))
@@ -584,7 +584,7 @@ class ChainDict(Dictionary):
                 these_keys = [k for k in include if k in dictionary]
             new_contents.append(
                 dictionary.subset(
-                    include=these_keys, exclude=exclude, returns="class"
+                    include=these_keys, exclude=exclude, returns='class'
                 )
             )
         return utilities._return_subset(
@@ -629,7 +629,7 @@ class ChainDict(Dictionary):
                 if self.return_first:
                     return matches[0]
         if not matches:
-            raise KeyError(f"{key} is not found in the ChainDict")
+            raise KeyError(f'{key} is not found in the ChainDict')
         return matches if len(matches) > 1 else matches[0]
 
     def __iter__(self) -> Iterator[Hashable]:

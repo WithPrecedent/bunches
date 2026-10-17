@@ -34,7 +34,7 @@ def _capitalify(item: str) -> str:
         'item' converted to capital case.
 
     """
-    return item.replace("_", " ").title().replace(" ", "")
+    return item.replace('_', ' ').title().replace(' ', '')
 
 
 def _is_sequence(item: Any) -> bool:
@@ -93,14 +93,14 @@ def _namify(item: Any, /, default: str | None = None) -> str | None:
     if isinstance(item, str):
         return item
     if (
-        hasattr(item, "name")
+        hasattr(item, 'name')
         and not inspect.isclass(item)
         and isinstance(item.name, str)
     ):
         return item.name
-    name = getattr(item, "__name__", None)
+    name = getattr(item, '__name__', None)
     if not isinstance(name, str):
-        name = getattr(item.__class__, "__name__", None)
+        name = getattr(item.__class__, '__name__', None)
     return _snakify(name) if isinstance(name, str) and name else default
 
 
@@ -123,13 +123,13 @@ def _return_subset(
         A `Collection` with a `subset` of data.
 
     """
-    if returns == "class":
+    if returns == 'class':
         return existing.__class__(subset)  # type: ignore[call-arg]
-    if returns == "copy":
+    if returns == 'copy':
         new_collection = copy.deepcopy(existing)
         new_collection.contents = subset  # type: ignore[attr-defined]
         return new_collection
-    if returns == "simple":
+    if returns == 'simple':
         return subset
     message = 'returns argument must be "class", "copy", or "simple"'
     raise ValueError(message)
@@ -145,8 +145,8 @@ def _snakify(item: str) -> str:
         'item' converted to snake case.
 
     """
-    item = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", item)
-    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", item).lower()
+    item = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', item)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', item).lower()
 
 
 def _uniquify(key: str, dictionary: GenericDict, index: int = 1) -> str:
@@ -171,6 +171,6 @@ def _uniquify(key: str, dictionary: GenericDict, index: int = 1) -> str:
         counter += 1
         if counter > 2:  # noqa: PLR2004
             key = key.removesuffix(str(counter - 1))
-        key = "".join([key, str(counter)])
+        key = ''.join([key, str(counter)])
         if key not in dictionary:
             return key

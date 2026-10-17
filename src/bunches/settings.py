@@ -24,23 +24,23 @@ if TYPE_CHECKING:
     from .kinds import SubsetReturns
 
 
-_ALL_KEYS: list[Any] = ["all", "All", ["all"], ["All"]]
+_ALL_KEYS: list[Any] = ['all', 'All', ['all'], ['All']]
 _DEFAULT_KEYS: list[Any] = [
-    "default",
-    "defaults",
-    "Default",
-    "Defaults",
-    ["default"],
-    ["defaults"],
-    ["Default"],
-    ["Defaults"],
+    'default',
+    'defaults',
+    'Default',
+    'Defaults',
+    ['default'],
+    ['defaults'],
+    ['Default'],
+    ['Defaults'],
 ]
 _KEY_NAMER: Callable[[object | type[Any]], str | None] = utilities._namify
 _METHOD_NAMER: Callable[[object | type[Any]], str] = lambda x: (
-    f"from_{utilities._namify(x)}"
+    f'from_{utilities._namify(x)}'
 )
-_NONE_KEYS: list[Any] = ["none", "None", ["none"], ["None"]]
-_SUBSET_RETURN: SubsetReturns = "class"
+_NONE_KEYS: list[Any] = ['none', 'None', ['none'], ['None']]
+_SUBSET_RETURN: SubsetReturns = 'class'
 
 
 def set_key_namer(namer: Callable[[object | type[Any]], str | None]) -> None:
@@ -54,8 +54,8 @@ def set_key_namer(namer: Callable[[object | type[Any]], str | None]) -> None:
 
     """
     if not callable(namer):
-        raise TypeError("namer argument must be a callable")
-    globals()["_KEY_NAMER"] = namer
+        raise TypeError('namer argument must be a callable')
+    globals()['_KEY_NAMER'] = namer
 
 
 def set_method_namer(namer: Callable[[object | type[Any]], str]) -> None:
@@ -69,8 +69,8 @@ def set_method_namer(namer: Callable[[object | type[Any]], str]) -> None:
 
     """
     if not callable(namer):
-        raise TypeError("namer argument must be a callable")
-    globals()["_METHOD_NAMER"] = namer
+        raise TypeError('namer argument must be a callable')
+    globals()['_METHOD_NAMER'] = namer
 
 
 def set_subset_return(returns: SubsetReturns) -> None:
@@ -85,7 +85,7 @@ def set_subset_return(returns: SubsetReturns) -> None:
         ValueError: if 'returns' is not 'class', 'copy', or 'simple'.
 
     """
-    if returns not in ("class", "copy", "simple"):
+    if returns not in ('class', 'copy', 'simple'):
         message = 'returns argument must be "class", "copy", or "simple"'
         raise ValueError(message)
-    globals()["_SUBSET_RETURN"] = returns
+    globals()['_SUBSET_RETURN'] = returns
