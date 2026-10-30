@@ -76,6 +76,12 @@ def test_namify_default() -> None:
 
         @property
         def __name__(cls) -> str:  # type: ignore[override]
+            """Returns an empty name.
+
+            Returns:
+                An empty `str`.
+
+            """
             return ''
 
     class Nameless(metaclass = Meta):
@@ -101,8 +107,10 @@ def test_return_subset() -> None:
     assert dictionary.contents == {'a': 1, 'b': 2}
     assert utilities._return_subset(subset, dictionary, 'simple') is subset
     with pytest.raises(ValueError, match = 'returns argument'):
-        utilities._return_subset(subset, dictionary, 'other')  # type: ignore[arg-type]
-    assert utilities._return_subset([1], Listing([1, 2]), 'class') == Listing([1])
+        utilities._return_subset(
+            subset, dictionary, 'other')  # type: ignore[arg-type]
+    listing = Listing([1, 2])
+    assert utilities._return_subset([1], listing, 'class') == Listing([1])
 
 
 def test_uniquify() -> None:
@@ -114,3 +122,29 @@ def test_uniquify() -> None:
     existing = {'key': 1} | {f'key{i}': 1 for i in range(2, 12)}
     assert utilities._uniquify('key', existing) == 'key12'
     assert utilities._uniquify('key', {'key': 1}, index = 4) == 'key5'
+
+
+def test_uniquify_index() -> None:
+    """Tests `_uniquify` with keys that end in the starting index."""
+    assert utilities._uniquify('v4', {'v4': 1}, index = 4) == 'v45'
+    assert utilities._uniquify('a', {'a': 1, 'a1': 1}, index = 0) == 'a2'
+    assert utilities._uniquify('a', {'a': 1}, index = 0) == 'a1'
+
+
+def test_is_sequence_bunches() -> None:
+    """Tests `_is_sequence` with `bunches` classes."""
+    assert utilities._is_sequence(Listing([1]))
+    assert utilities._is_sequence(range(3))
+    assert not utilities._is_sequence(Dictionary({'a': 1}))
+
+
+def test_namify_class_with_name_attribute() -> None:
+    """Tests that a class's `name` attribute is not used for the class."""
+
+    class Named:
+        """Class with a `name` class attribute."""
+
+        name = 'instance_name'
+
+    assert utilities._namify(Named()) == 'instance_name'
+    assert utilities._namify(Named) == 'named'

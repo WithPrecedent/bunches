@@ -1,14 +1,7 @@
 """Functions for inferring names, iterating, and building subsets.
 
-Contents:
-    _capitalify: converts a snake case `str` to capital case.
-    _is_sequence: returns whether an item is a sequence, but not `str` or
-        `bytes`.
-    _iterify: returns an item as an iterator without iterating `str` types.
-    _namify: infers a `str` name for an object or class.
-    _return_subset: builds the return value of `subset` methods.
-    _snakify: converts a capitalized `str` to snake case.
-    _uniquify: creates a key that is not yet in a mapping.
+The module only holds private helpers for the other `bunches` modules. Each is
+described in its own docstring.
 
 """
 
@@ -22,6 +15,9 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from .kinds import GenericDict, SubsetReturns
+
+
+""" Private Functions """
 
 
 def _capitalify(item: str) -> str:
@@ -92,11 +88,9 @@ def _namify(item: Any, /, default: str | None = None) -> str | None:
     """
     if isinstance(item, str):
         return item
-    if (
-        hasattr(item, 'name')
-        and not inspect.isclass(item)
-        and isinstance(item.name, str)
-    ):
+    if (hasattr(item, 'name')
+            and not inspect.isclass(item)
+            and isinstance(item.name, str)):
         return item.name
     name = getattr(item, '__name__', None)
     if not isinstance(name, str):
@@ -105,8 +99,9 @@ def _namify(item: Any, /, default: str | None = None) -> str | None:
 
 
 def _return_subset(
-    subset: Collection, existing: Collection, returns: SubsetReturns
-) -> Collection:
+        subset: Collection,
+        existing: Collection,
+        returns: SubsetReturns) -> Collection:
     """Returns a subset of an item.
 
     Args:
@@ -116,11 +111,11 @@ def _return_subset(
             ('class'), a deep copy of 'existing' with 'subset' as its
             `contents` ('copy'), or 'subset' itself ('simple').
 
-    Raises:
-        ValueError: if 'returns' is not 'class', 'copy', or 'simple'.
-
     Returns:
         A `Collection` with a `subset` of data.
+
+    Raises:
+        ValueError: if 'returns' is not 'class', 'copy', or 'simple'.
 
     """
     if returns == 'class':
@@ -169,8 +164,6 @@ def _uniquify(key: str, dictionary: GenericDict, index: int = 1) -> str:
     counter = index
     while True:
         counter += 1
-        if counter > 2:  # noqa: PLR2004
-            key = key.removesuffix(str(counter - 1))
-        key = ''.join([key, str(counter)])
-        if key not in dictionary:
-            return key
+        candidate = f'{key}{counter}'
+        if candidate not in dictionary:
+            return candidate

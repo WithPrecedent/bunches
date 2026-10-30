@@ -1,22 +1,16 @@
 # Automatically updates dependency versions using dependabot.
-# The Python dependencies are declared in `pyproject.toml` and locked in
-# `uv.lock` at the repository root, so the `uv` ecosystem is pointed there.
 
 version: 2
 updates:
-  - package-ecosystem: uv
-    directory: "/"
-    schedule:
-      interval: weekly
-    labels:
-      - "dependencies"
-      - "python"
-    open-pull-requests-limit: 10
-  - package-ecosystem: github-actions
-    directory: "/"
-    schedule:
-      interval: weekly
-    labels:
-      - "dependencies"
-      - "github_actions"
-    open-pull-requests-limit: 10
+
+# Maintains the Python dependencies in `pyproject.toml` and `uv.lock`
+- package-ecosystem: uv
+  directory: "/"
+  schedule:
+    interval: weekly
+
+# Maintains the versions of the GitHub Actions used in `.github/workflows`
+- package-ecosystem: github-actions
+  directory: "/"
+  schedule:
+    interval: weekly

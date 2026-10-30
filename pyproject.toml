@@ -4,9 +4,11 @@
 name = "bunches"
 description = "Drop-in replacements for Python collections"
 authors = [{name = "Corey Rayburn Yung", email = "coreyrayburnyung@gmail.com"}]
-license = {text = "Apache Software License 2.0"}
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.11"
+# The version is set by `__version__` in "src/bunches/__init__.py".
 dynamic = ["version"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -17,9 +19,13 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14"]
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15"]
 keywords = []
 dependencies = []
+
+[project.optional-dependencies]
+
 
 [project.urls]
 Documentation = "https://WithPrecedent.github.io/bunches"
@@ -54,7 +60,8 @@ tests = [
     "pytest-xdist"]
 
 [build-system]
-requires = ["hatchling"]
+# Version 1.27 is the first to support SPDX license expressions (PEP 639).
+requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
@@ -63,11 +70,15 @@ path = "src/bunches/__init__.py"
 [tool.hatch.build.targets.wheel]
 packages = ["src/bunches"]
 
+
 [tool.coverage.report]
 skip_empty = true
 show_missing = true
-exclude_lines = [
-  "if TYPE_CHECKING:"]
+# Adds to (instead of replacing) the default exclusions, such as
+# "pragma: no cover".
+exclude_also = [
+  "if TYPE_CHECKING:",
+  "if __name__ == .__main__.:"]
 
 [tool.coverage.paths]
 source = ["src", "*/site-packages"]
@@ -76,6 +87,8 @@ tests = ["tests", "*/tests"]
 [tool.coverage.run]
 branch = true
 source = ["bunches", "tests"]
+
+
 
 [tool.mypy]
 files = ['src']
@@ -87,6 +100,7 @@ warn_return_any = true
 warn_unused_ignores = true
 show_error_codes = true
 
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--showlocals"
@@ -95,6 +109,8 @@ pythonpath = ["src"]
 
 [tool.ruff]
 extend-exclude = ["docs", "scripts", "site", "tests", ".*.*"]
+# Keeps `extend-exclude` when pre-commit passes file paths to ruff.
+force-exclude = true
 fix = true
 line-length = 80
 lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
@@ -112,7 +128,6 @@ lint.ignore = [
     "D406",  # Section name should end with a newline - bugged for 'Attributes:'
     "D407",  # Missing dashed underline after section ("Args")
     "D415",  # First line must end in a period, question mark, or exclamation point
-    "E501",  # Line too long
     "E731",  # Do not assign a `lambda` expression, use a `def`
     "ERA001",  # Commented out code
     "EXE002",  # No shebang is present in an executable file
@@ -125,7 +140,6 @@ lint.ignore = [
     "PLR0913",  # Too many arguments to function call
     "PLR0915",  # Too many statements
     "PLR1711", # Useless 'return' at the end of function
-    "Q000",  # Single quotes found but double quotes preferred
     "RET505",  # Unnecessary `else` after `return` statement
     # "S0001",  # Use of assert detected
     "SLF001", # Private member accessed
@@ -207,3 +221,8 @@ ignore-decorators = ["typing.overload"]
 
 [tool.uv]
 package = true
+
+[tool.cruft]
+# Paths that `cruft update` leaves alone because they belong to this project
+# instead of the `snickerdoodle` template.
+skip = ["CHANGELOG.md", "src", "tests", "uv.lock"]

@@ -2,12 +2,12 @@
 
 | | |
 | --- | --- |
-| Version | [![PyPI Latest Release](https://img.shields.io/pypi/v/bunches.svg?style=for-the-badge&color=steelblue&label=PyPI&logo=PyPI&logoColor=yellow)](https://pypi.org/project/bunches/) [![GitHub Latest Release](https://img.shields.io/github/v/tag/WithPrecedent/bunches?style=for-the-badge&color=navy&label=GitHub&logo=github)](https://github.com/WithPrecedent/bunches/releases)
-| Status | [![Build Status](https://img.shields.io/github/actions/workflow/status/WithPrecedent/bunches/ci.yml?branch=main&style=for-the-badge&color=cadetblue&label=Tests&logo=pytest)](https://github.com/WithPrecedent/bunches/actions/workflows/ci.yml?query=branch%3Amain) [![Development Status](https://img.shields.io/badge/Development-Active-seagreen?style=for-the-badge&logo=git)](https://www.repostatus.org/#active) [![Project Stability](https://img.shields.io/pypi/status/bunches?style=for-the-badge&logo=pypi&label=Stability&logoColor=yellow)](https://pypi.org/project/bunches/)
-| Documentation | [![Hosted By](https://img.shields.io/badge/Hosted_by-Github_Pages-blue?style=for-the-badge&color=navy&logo=github)](https://WithPrecedent.github.io/bunches)
-| Tools | [![Documentation](https://img.shields.io/badge/MkDocs-magenta?style=for-the-badge&color=deepskyblue&logo=markdown&labelColor=gray)](https://squidfunk.github.io/mkdocs-material/) [![Linter](https://img.shields.io/endpoint?style=for-the-badge&url=https://raw.githubusercontent.com/charliermarsh/Ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/Ruff) [![Dependency Manager](https://img.shields.io/badge/uv-mediumpurple?style=for-the-badge&logo=uv&labelColor=gray&logoColor=white)](https://docs.astral.sh/uv/) [![Pre-commit](https://img.shields.io/badge/pre--commit-darkolivegreen?style=for-the-badge&logo=pre-commit&logoColor=white&labelColor=gray)](https://github.com/TezRomacH/python-package-template/blob/master/.pre-commit-config.yaml) [![CI](https://img.shields.io/badge/GitHub_Actions-navy?style=for-the-badge&logo=githubactions&labelColor=gray&logoColor=white)](https://github.com/features/actions) [![Editor Settings](https://img.shields.io/badge/Editor_Config-paleturquoise?style=for-the-badge&logo=editorconfig&labelColor=gray)](https://editorconfig.org/) [![Repository Template](https://img.shields.io/badge/snickerdoodle-bisque?style=for-the-badge&logo=cookiecutter&labelColor=gray)](https://www.github.com/WithPrecedent/snickerdoodle) [![Dependency Maintainer](https://img.shields.io/badge/dependabot-navy?style=for-the-badge&logo=dependabot&logoColor=white&labelColor=gray)](https://github.com/dependabot)
-| Compatibility | [![Compatible Python Versions](https://img.shields.io/pypi/pyversions/bunches?style=for-the-badge&color=steelblue&label=Python&logo=python&logoColor=yellow)](https://pypi.python.org/pypi/bunches/) [![Linux](https://img.shields.io/badge/Linux-lightseagreen?style=for-the-badge&logo=linux&labelColor=gray&logoColor=white)](https://www.linux.org/) [![MacOS](https://img.shields.io/badge/MacOS-snow?style=for-the-badge&logo=apple&labelColor=gray)](https://www.apple.com/macos/) [![Windows](https://img.shields.io/badge/windows-blue?style=for-the-badge&logo=Windows&labelColor=gray&color=orangered)](https://www.microsoft.com/en-us/windows?r=1)
-| Stats | [![PyPI Download Rate (per month)](https://img.shields.io/pypi/dm/bunches?style=for-the-badge&color=steelblue&label=Downloads%20💾&logo=pypi&logoColor=yellow)](https://pypi.org/project/bunches) [![GitHub Stars](https://img.shields.io/github/stars/WithPrecedent/bunches?style=for-the-badge&color=navy&label=Stars%20⭐&logo=github)](https://github.com/WithPrecedent/bunches/stargazers) [![GitHub Contributors](https://img.shields.io/github/contributors/WithPrecedent/bunches?style=for-the-badge&color=navy&label=Contributors%20🙋&logo=github)](https://github.com/WithPrecedent/bunches/graphs/contributors) [![GitHub Issues](https://img.shields.io/github/issues/WithPrecedent/bunches?style=for-the-badge&color=navy&label=Issues%20📘&logo=github)](https://github.com/WithPrecedent/bunches/graphs/contributors) [![GitHub Forks](https://img.shields.io/github/forks/WithPrecedent/bunches?style=for-the-badge&color=navy&label=Forks%20🍴&logo=github)](https://github.com/WithPrecedent/bunches/forks)
+| Version | [![PyPI Latest Release](https://img.shields.io/pypi/v/bunches.svg?style=for-the-badge&color=cornflowerblue&label=PyPI&logo=PyPI&logoColor=yellow)](https://pypi.org/project/bunches/) [![GitHub Latest Release](https://img.shields.io/github/v/tag/WithPrecedent/bunches?style=for-the-badge&color=forestgreen&label=GitHub&logo=github)](https://github.com/WithPrecedent/bunches/releases) |
+| Status | [![Build Status](https://img.shields.io/github/actions/workflow/status/WithPrecedent/bunches/ci.yml?style=for-the-badge&branch=main&color=cadetblue&label=Tests&logo=pytest)](https://github.com/WithPrecedent/bunches/actions/workflows/ci.yml?query=branch%3Amain) [![Code Coverage](https://img.shields.io/codecov/c/github/WithPrecedent/bunches?style=for-the-badge&color=cadetblue&label=Coverage&logo=codecov)](https://app.codecov.io/gh/WithPrecedent/bunches) [![Development Status](https://img.shields.io/badge/Development-Active-seagreen?style=for-the-badge&logo=git)](https://www.repostatus.org/#active) [![Project Stability](https://img.shields.io/pypi/status/bunches?style=for-the-badge&logo=pypi&label=Stability&logoColor=yellow)](https://pypi.org/project/bunches/) |
+| Documentation | [![Hosted By](https://img.shields.io/badge/Hosted_by-Github_Pages-blue?style=for-the-badge&color=forestgreen&logo=github)](https://WithPrecedent.github.io/bunches) |
+| Tools | [![Documentation](https://img.shields.io/badge/MkDocs-magenta?style=for-the-badge&color=deepskyblue&logo=markdown&labelColor=gray)](https://squidfunk.github.io/mkdocs-material/) [![Linter](https://img.shields.io/endpoint?style=for-the-badge&url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff) [![Type Checker](https://img.shields.io/badge/mypy-steelblue?style=for-the-badge&logo=python&logoColor=white&labelColor=gray)](https://mypy-lang.org/) [![Dependency Manager](https://img.shields.io/badge/uv-mediumpurple?style=for-the-badge&logo=uv&labelColor=gray)](https://docs.astral.sh/uv/) [![Pre-commit](https://img.shields.io/badge/pre--commit-darkolivegreen?style=for-the-badge&logo=pre-commit&logoColor=white&labelColor=gray)](https://pre-commit.com/) [![CI](https://img.shields.io/badge/GitHub_Actions-forestgreen?style=for-the-badge&logo=githubactions&labelColor=gray&logoColor=white)](https://github.com/features/actions) [![Editor Settings](https://img.shields.io/badge/Editor_Config-paleturquoise?style=for-the-badge&logo=editorconfig&labelColor=gray)](https://editorconfig.org/) [![Repository Template](https://img.shields.io/badge/snickerdoodle-bisque?style=for-the-badge&logo=cookiecutter&labelColor=gray)](https://www.github.com/WithPrecedent/snickerdoodle) [![Dependency Maintainer](https://img.shields.io/badge/dependabot-forestgreen?style=for-the-badge&logo=dependabot&logoColor=white&labelColor=gray)](https://github.com/dependabot) |
+| Compatibility | [![Compatible Python Versions](https://img.shields.io/pypi/pyversions/bunches?style=for-the-badge&color=cornflowerblue&label=Python&logo=python&logoColor=yellow)](https://pypi.org/project/bunches/) [![Linux](https://img.shields.io/badge/Linux-lightseagreen?style=for-the-badge&logo=linux&labelColor=gray&logoColor=white)](https://www.linux.org/) [![MacOS](https://img.shields.io/badge/MacOS-antiquewhite?style=for-the-badge&logo=apple&labelColor=gray)](https://www.apple.com/macos/) [![Windows](https://img.shields.io/badge/Windows-blue?style=for-the-badge)](https://www.microsoft.com/en-us/windows?r=1) |
+| Stats | [![PyPI Download Rate (per month)](https://img.shields.io/pypi/dm/bunches?style=for-the-badge&color=cornflowerblue&label=Downloads%20💾&logo=pypi&logoColor=yellow)](https://pypi.org/project/bunches/) [![GitHub Stars](https://img.shields.io/github/stars/WithPrecedent/bunches?style=for-the-badge&color=forestgreen&label=Stars%20⭐&logo=github)](https://github.com/WithPrecedent/bunches/stargazers) [![GitHub Contributors](https://img.shields.io/github/contributors/WithPrecedent/bunches?style=for-the-badge&color=forestgreen&label=Contributors%20🙋&logo=github)](https://github.com/WithPrecedent/bunches/graphs/contributors) [![GitHub Issues](https://img.shields.io/github/issues/WithPrecedent/bunches?style=for-the-badge&color=forestgreen&label=Issues%20📘&logo=github)](https://github.com/WithPrecedent/bunches/issues) [![GitHub Forks](https://img.shields.io/github/forks/WithPrecedent/bunches?style=for-the-badge&color=forestgreen&label=Forks%20🍴&logo=github)](https://github.com/WithPrecedent/bunches/forks) |
 | | |
 
 -----
@@ -65,15 +65,15 @@ A `Dictionary` works like a `dict`. Its `add` method updates the stored data, `s
 ```python
 from bunches import Dictionary
 
-colors = Dictionary(contents={"red": 1, "green": 2}, default_factory=0)
-colors.add({"blue": 3})
-colors["blue"]  # 3
-colors.get("purple")  # 0
-colors.subset(include=["red", "blue"]).contents  # {'red': 1, 'blue': 3}
-colors.subset(exclude="red").keys()  # ('green', 'blue')
-del colors["green"]
+colors = Dictionary(contents = {'red': 1, 'green': 2}, default_factory = 0)
+colors.add({'blue': 3})
+colors['blue']  # 3
+colors.get('purple')  # 0
+colors.subset(include = ['red', 'blue']).contents  # {'red': 1, 'blue': 3}
+colors.subset(exclude = 'red').keys()  # ('green', 'blue')
+del colors['green']
 colors.contents  # {'red': 1, 'blue': 3}
-(colors + {"pink": 4}).contents  # {'red': 1, 'blue': 3, 'pink': 4}
+(colors + {'pink': 4}).contents  # {'red': 1, 'blue': 3, 'pink': 4}
 colors.contents  # {'red': 1, 'blue': 3}
 ```
 
@@ -84,13 +84,13 @@ A `Catalog` is meant for storing options. The `all`, `default` and `none` keys a
 ```python
 from bunches import Catalog
 
-models = Catalog(contents={"tree": "DecisionTree", "forest": "RandomForest"})
-models["tree"]  # 'DecisionTree'
-models[["tree", "forest"]]  # ['DecisionTree', 'RandomForest']
-models["all"]  # ['DecisionTree', 'RandomForest']
-models.default = "forest"
-models["default"]  # 'RandomForest'
-models["none"] is None  # True
+models = Catalog(contents = {'tree': 'DecisionTree', 'forest': 'RandomForest'})
+models['tree']  # 'DecisionTree'
+models[['tree', 'forest']]  # ['DecisionTree', 'RandomForest']
+models['all']  # ['DecisionTree', 'RandomForest']
+models.default = 'forest'
+models['default']  # 'RandomForest'
+models['none'] is None  # True
 ```
 
 #### ChainDict
@@ -100,11 +100,11 @@ A `ChainDict` searches its stored dictionaries in order and returns the first ma
 ```python
 from bunches import ChainDict, Dictionary
 
-chain = ChainDict(contents=[Dictionary({"a": 1}), Dictionary({"a": 2, "b": 3})])
-chain["a"], chain["b"]  # (1, 3)
+chain = ChainDict(contents = [Dictionary({'a': 1}), Dictionary({'a': 2, 'b': 3})])
+chain['a'], chain['b']  # (1, 3)
 chain.return_first = False
-chain["a"]  # [1, 2]
-chain.new_child(Dictionary({"c": 4}))
+chain['a']  # [1, 2]
+chain.new_child(Dictionary({'c': 4}))
 chain.keys()  # ('c', 'a', 'a', 'b')
 ```
 
@@ -127,10 +127,10 @@ class DataLoader:
 
 
 repository = Repository()
-repository.add(Worker("ann"))
+repository.add(Worker('ann'))
 repository.add(DataLoader())
 repository.add(DataLoader())
-repository.add(Worker("bob"), key="boss")
+repository.add(Worker('bob'), key = 'boss')
 repository.keys()  # ('ann', 'data_loader', 'data_loader2', 'boss')
 ```
 
@@ -141,12 +141,12 @@ A `Listing` works like a `list`. `add` extends the list with a sequence and appe
 ```python
 from bunches import Listing
 
-letters = Listing(contents=["b", "c"])
-letters.add("d")
-letters.add(["e", "f"])
-letters.prepend("a")
+letters = Listing(contents = ['b', 'c'])
+letters.add('d')
+letters.add(['e', 'f'])
+letters.prepend('a')
 letters.contents  # ['a', 'b', 'c', 'd', 'e', 'f']
-letters.subset(include=["a", "b", "c"], exclude="b").contents  # ['a', 'c']
+letters.subset(include = ['a', 'b', 'c'], exclude = 'b').contents  # ['a', 'c']
 letters.delete(0)
 letters[0]  # 'b'
 ```
@@ -158,12 +158,12 @@ A `DictList` is a `list` you can also search by name. Items are found by their `
 ```python
 from bunches import DictList
 
-workers = DictList(contents=[Worker("ann"), Worker("bob"), Worker("ann")])
+workers = DictList(contents = [Worker('ann'), Worker('bob'), Worker('ann')])
 workers.keys()  # ('ann', 'bob', 'ann')
-workers["bob"]  # Worker(name='bob')
-len(workers["ann"])  # 2
+workers['bob']  # Worker(name='bob')
+len(workers['ann'])  # 2
 workers[1]  # Worker(name='bob')
-workers.delete("ann")
+workers.delete('ann')
 workers.keys()  # ('bob',)
 ```
 
@@ -172,8 +172,8 @@ workers.keys()  # ('bob',)
 Every `subset` method has a `returns` argument. `'class'` (the default) returns a new instance of the same class, `'copy'` returns a deep copy of the instance (keeping its other settings) and `'simple'` returns the built-in type. To change the default for the whole package, use `bunches.settings.set_subset_return`.
 
 ```python
-colors = Dictionary({"red": 1, "green": 2})
-colors.subset(include="red", returns="simple")  # {'red': 1}
+colors = Dictionary({'red': 1, 'green': 2})
+colors.subset(include = 'red', returns = 'simple')  # {'red': 1}
 ```
 
 #### Naming items
@@ -184,8 +184,8 @@ colors.subset(include="red", returns="simple")  # {'red': 1}
 from bunches import settings
 
 settings.set_key_namer(lambda item: str(item).upper())
-Repository({"a": 1}).add("b")
-DictList(["x", "y"]).keys()  # ('X', 'Y')
+Repository({'a': 1}).add('b')
+DictList(['x', 'y']).keys()  # ('X', 'Y')
 settings.set_key_namer(settings.utilities._namify)
 ```
 

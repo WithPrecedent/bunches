@@ -14,7 +14,12 @@ DOCS = pathlib.Path(__file__).parents[1] / 'docs'
 
 @pytest.mark.parametrize('name', ['tutorial', 'advanced', 'recipes'])
 def test_doc_examples_run(name: str) -> None:
-    """Executes all of the python code blocks of a documentation page."""
+    """Executes all of the python code blocks of a documentation page.
+
+    Args:
+        name: name of the documentation page.
+
+    """
     text = (DOCS / f'{name}.md').read_text(encoding = 'utf-8')
     blocks = re.findall(r'```python\n(.*?)```', text, flags = re.DOTALL)
     assert blocks
@@ -22,7 +27,8 @@ def test_doc_examples_run(name: str) -> None:
     sys.modules[module.__name__] = module
     try:
         for block in blocks:
-            exec(compile(block, f'{name}.md', 'exec'), module.__dict__)  # noqa: S102
+            code = compile(block, f'{name}.md', 'exec')
+            exec(code, module.__dict__)  # noqa: S102
     finally:
         del sys.modules[module.__name__]
 

@@ -70,4 +70,9 @@ class Stack(Bunch):
 * `+` never modifies the original instance; `+=` always does.
 * `ChainDict` iteration, `len` and `keys` include a key once for every stored mapping that has it.
 * `Catalog.delete` removes nothing if any key requested is missing.
+* A `Catalog` treats a `tuple` that is a stored key as one key. Any other sequence of keys returns (or deletes) each of its keys.
+* `in` only checks the stored keys. The `all`, `default` and `none` wildcards of a `Catalog` are not "in" it unless they are stored keys.
+* `subset` always returns deep copies of the selected values, so changing the subset never changes the original.
+* `DictList.subset` selects items by name, as `DictList` indexing, `get` and `delete` do.
+* `ChainDict.new_child` wraps a plain mapping in a `Dictionary` and adds an empty `Dictionary` when no mapping is passed.
 * `DictList.delete` with a name that matches nothing raises `KeyError`.

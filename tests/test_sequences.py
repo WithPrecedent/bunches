@@ -105,9 +105,11 @@ class TestListing:
         """Tests the `returns` argument of `subset`."""
         listing = Listing(['a', 'b'])
         assert listing.subset(include = 'a', returns = 'simple') == ['a']
-        assert isinstance(listing.subset(include = 'a', returns = 'copy'), Listing)
+        copied = listing.subset(include = 'a', returns = 'copy')
+        assert isinstance(copied, Listing)
         with pytest.raises(ValueError, match = 'returns argument'):
-            listing.subset(include = 'a', returns = 'other')  # type: ignore[arg-type]
+            listing.subset(
+                include = 'a', returns = 'other')  # type: ignore[arg-type]
         settings.set_subset_return('simple')
         assert listing.subset(include = 'a') == ['a']
 
@@ -127,13 +129,54 @@ class TestListing:
         assert Listing([1, 2]) == Listing([1, 2])
         assert Listing([1, 2]) != Listing([2, 1])
 
+    def test_add_operator_is_deep_copy(self) -> None:
+        """Tests that `+` does not share mutable items with the original."""
+        listing = Listing([[1]])
+        combined = listing + [2]
+        combined[0].append(3)
+        assert listing.contents == [[1]]
+
+    def test_add_listing(self) -> None:
+        """Tests that adding a `Listing` extends with its items."""
+        listing = Listing([1])
+        listing += Listing([2, 3])
+        assert listing.contents == [1, 2, 3]
+        listing.add(range(4, 6))
+        assert listing.contents == [1, 2, 3, 4, 5]
+
+    def test_prepend_strings_and_tuples(self) -> None:
+        """Tests that `prepend` keeps `str` and `bytes` items whole."""
+        listing = Listing(['c'])
+        listing.prepend('ab')
+        listing.prepend(b'x')
+        listing.prepend(('y', 'z'))
+        assert listing.contents == ['y', 'z', b'x', 'ab', 'c']
+
+    def test_subset_unhashable_items(self) -> None:
+        """Tests `subset` with unhashable items."""
+        listing = Listing([[1], [2], [3]])
+        assert listing.subset(include = [[1], [3]]).contents == [[1], [3]]
+        assert listing.subset(exclude = [[2]]).contents == [[1], [3]]
+
+    def test_subset_include_is_deep_copy(self) -> None:
+        """Tests that including items does not share mutable items."""
+        listing = Listing([[1], [2]])
+        subset = listing.subset(include = [[1]])
+        subset[0].append(5)
+        assert listing.contents == [[1], [2]]
+
 
 class TestDictList:
     """Tests for `DictList`."""
 
     @pytest.fixture
     def dictlist(self) -> DictList:
-        """Returns a `DictList` of strings."""
+        """Returns a `DictList` of strings.
+
+        Returns:
+            `DictList` of strings.
+
+        """
         return DictList(['a', 'b', 'c'])
 
     def test_init(self) -> None:
@@ -143,7 +186,12 @@ class TestDictList:
         assert dictlist.default_factory is None
 
     def test_list_interface(self, dictlist: DictList) -> None:
-        """Tests list behavior inherited from `Listing`."""
+        """Tests list behavior inherited from `Listing`.
+
+        Args:
+            dictlist: `DictList` of strings.
+
+        """
         dictlist.add('d')
         assert dictlist[3] == 'd'
         dictlist.insert(2, 'zebra')
@@ -182,7 +230,12 @@ class TestDictList:
         assert dictlist['b'] == 'b'
 
     def test_setitem(self, dictlist: DictList) -> None:
-        """Tests `__setitem__` with an index and with a name."""
+        """Tests `__setitem__` with an index and with a name.
+
+        Args:
+            dictlist: `DictList` of strings.
+
+        """
         dictlist[0] = 'z'
         assert dictlist.contents == ['z', 'b', 'c']
         dictlist['ignored'] = 'd'
@@ -191,7 +244,12 @@ class TestDictList:
         assert dictlist.contents == ['z', 'b', 'c', 'd', 'e', 'f']
 
     def test_get(self, dictlist: DictList) -> None:
-        """Tests `get` with and without defaults."""
+        """Tests `get` with and without defaults.
+
+        Args:
+            dictlist: `DictList` of strings.
+
+        """
         assert dictlist.get('a') == 'a'
         assert dictlist.get(1) == 'b'
         assert dictlist.get('tree', 'No') == 'No'
@@ -217,7 +275,12 @@ class TestDictList:
             ('a', 'a'), ('something', something), ('a', 'a'))
 
     def test_update(self, dictlist: DictList) -> None:
-        """Tests `update`, which discards the keys."""
+        """Tests `update`, which discards the keys.
+
+        Args:
+            dictlist: `DictList` of strings.
+
+        """
         dictlist.update({'ignored': 'd', 'also_ignored': 'e'})
         assert dictlist.contents == ['a', 'b', 'c', 'd', 'e']
 
@@ -277,3 +340,60 @@ class TestDictList:
         dictlist.add(item)
         assert dictlist.keys() == ('something',)
         assert dictlist.values() == (item,)
+
+    def test_getitem_slice_and_negative_index(
+            self, dictlist: DictList) -> None:
+        """Tests that slices return lists and negative indexes work.
+
+        Args:
+            dictlist: `DictList` of strings.
+
+        """
+        assert dictlist[-1] == 'c'
+        assert dictlist[::2] == ['a', 'c']
+        assert dictlist.get(slice(0, 1)) == ['a']
+
+    def test_custom_key_namer(self) -> None:
+        """Tests that `DictList` uses the global key namer."""
+        settings.set_key_namer(lambda item: getattr(item, 'name', 'unnamed'))
+        dictlist = DictList([Something(), 'plain'])
+        assert dictlist.keys() == ('something', 'unnamed')
+        assert dictlist['unnamed'] == 'plain'
+        dictlist.delete('unnamed')
+        assert dictlist.keys() == ('something',)
+
+    def test_add_operators(self, dictlist: DictList) -> None:
+        """Tests `+` and `+=`.
+
+        Args:
+            dictlist: `DictList` of strings.
+
+        """
+        combined = dictlist + Something()
+        assert isinstance(combined, DictList)
+        assert combined['something'] == Something()
+        assert 'something' not in dictlist.keys()
+        dictlist += ['d']
+        assert dictlist.keys() == ('a', 'b', 'c', 'd')
+
+    def test_items_with_duplicate_names(self) -> None:
+        """Tests that `items` keeps every item with a duplicate name."""
+        first = Something('same')
+        second = Another('same')
+        dictlist = DictList([first, second])
+        assert dictlist.items() == (('same', first), ('same', second))
+        assert dictlist['same'].contents == [first, second]
+
+    def test_subset_by_name(self) -> None:
+        """Tests that `subset` selects items by name."""
+        first = Something()
+        second = Another()
+        third = Something('third')
+        dictlist = DictList([first, second, third])
+        subset = dictlist.subset(include = ['something', 'third'])
+        assert subset.keys() == ('something', 'third')
+        assert subset.values() == (first, third)
+        assert subset['third'] is not third
+        subset = dictlist.subset(exclude = 'another')
+        assert subset.keys() == ('something', 'third')
+        assert dictlist.subset(include = first).contents == []

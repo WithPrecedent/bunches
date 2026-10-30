@@ -32,9 +32,7 @@ class Unnamed:
 def _reset_settings() -> Iterator[None]:
     """Restores the global settings after each test."""
     namer = settings._KEY_NAMER
-    method_namer = settings._METHOD_NAMER
     subset_return = settings._SUBSET_RETURN
     yield
     settings._KEY_NAMER = namer
-    settings._METHOD_NAMER = method_namer
     settings._SUBSET_RETURN = subset_return

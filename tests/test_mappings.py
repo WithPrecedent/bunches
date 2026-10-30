@@ -124,7 +124,8 @@ class TestDictionary:
         assert copied.contents == {'a': 1}
         assert dictionary.subset(include = 'a').default_factory is None
         with pytest.raises(ValueError, match = 'returns argument'):
-            dictionary.subset(include = 'a', returns = 'other')  # type: ignore[arg-type]
+            dictionary.subset(
+                include = 'a', returns = 'other')  # type: ignore[arg-type]
         settings.set_subset_return('simple')
         assert dictionary.subset(include = 'a') == {'a': 1}
 
@@ -151,13 +152,91 @@ class TestDictionary:
         assert Dictionary({'a': 1}) != Dictionary({'a': 2})
         assert 'contents' in repr(Dictionary({'a': 1}))
 
+    def test_fromkeys_default_value(self) -> None:
+        """Tests that `fromkeys` matches `dict.fromkeys` without a value."""
+        dictionary = Dictionary.fromkeys(['a', 'b'])
+        assert dictionary.contents == {'a': None, 'b': None}
+        dictionary = Dictionary.fromkeys(key for key in 'xy')
+        assert dictionary.keys() == ('x', 'y')
+
+    def test_get_stored_falsy_values(self) -> None:
+        """Tests that `get` returns stored falsy values, not the default."""
+        dictionary = Dictionary({'a': 0, 'b': None}, default_factory = 5)
+        assert dictionary.get('a') == 0
+        assert dictionary.get('b') is None
+        assert dictionary.get('c') == 5
+
+    def test_add_operator_is_deep_copy(self) -> None:
+        """Tests that `+` does not share mutable values with the original."""
+        dictionary = Dictionary({'a': [1]})
+        combined = dictionary + {'b': 2}
+        combined['a'].append(2)
+        assert dictionary['a'] == [1]
+
+    def test_add_operator_keeps_class_and_fields(self) -> None:
+        """Tests that `+` returns the same class with the same fields."""
+        catalog = Catalog({'a': 1}, default = 'a', always_return_list = True)
+        combined = catalog + {'b': 2}
+        assert isinstance(combined, Catalog)
+        assert combined.default == 'a'
+        assert combined.always_return_list is True
+
+    def test_popitem(self) -> None:
+        """Tests `popitem` inherited from `MutableMapping`."""
+        dictionary = Dictionary({'a': 1})
+        assert dictionary.popitem() == ('a', 1)
+        assert len(dictionary) == 0
+        with pytest.raises(KeyError):
+            dictionary.popitem()
+
+    def test_tuple_keys(self) -> None:
+        """Tests that `tuple` keys work as in a `dict`."""
+        dictionary = Dictionary()
+        dictionary[('a', 'b')] = 1
+        assert dictionary[('a', 'b')] == 1
+        assert dictionary.subset(include = [('a', 'b')]).contents == {
+            ('a', 'b'): 1}
+        del dictionary[('a', 'b')]
+        assert len(dictionary) == 0
+
+    def test_contains(self) -> None:
+        """Tests that `in` only checks the stored keys."""
+        dictionary = Dictionary({'a': 1, ('b', 'c'): 2})
+        assert 'a' in dictionary
+        assert ('b', 'c') in dictionary
+        assert 'b' not in dictionary
+        assert ['a'] not in dictionary
+
+    def test_subset_include_is_deep_copy(self) -> None:
+        """Tests that including keys does not share mutable values."""
+        dictionary = Dictionary({'a': [1], 'b': [2]})
+        subset = dictionary.subset(include = 'a')
+        subset['a'].append(5)
+        assert dictionary['a'] == [1]
+        simple = dictionary.subset(include = 'a', returns = 'simple')
+        simple['a'].append(5)
+        assert dictionary['a'] == [1]
+
+    def test_subset_keeps_shared_values(self) -> None:
+        """Tests that values shared within the subset stay shared."""
+        shared = [1]
+        dictionary = Dictionary({'a': shared, 'b': shared, 'c': 3})
+        subset = dictionary.subset(include = ['a', 'b'])
+        assert subset['a'] is subset['b']
+        assert subset['a'] is not shared
+
 
 class TestCatalog:
     """Tests for `Catalog`."""
 
     @pytest.fixture
     def catalog(self) -> Catalog:
-        """Returns a `Catalog` with three items."""
+        """Returns a `Catalog` with three items.
+
+        Returns:
+            `Catalog` with three items.
+
+        """
         return Catalog(contents = {
             'tester': Something,
             'another': Another,
@@ -171,7 +250,12 @@ class TestCatalog:
         assert catalog.always_return_list is False
 
     def test_direct_access(self, catalog: Catalog) -> None:
-        """Tests direct key access and membership."""
+        """Tests direct key access and membership.
+
+        Args:
+            catalog: `Catalog` with three items.
+
+        """
         assert catalog['tester'] is Something
         assert 'tester' in catalog
         assert 'another' in catalog
@@ -181,7 +265,12 @@ class TestCatalog:
             catalog['missing']
 
     def test_all(self, catalog: Catalog) -> None:
-        """Tests the `all` wildcard."""
+        """Tests the `all` wildcard.
+
+        Args:
+            catalog: `Catalog` with three items.
+
+        """
         values = catalog['all']
         assert isinstance(values, list)
         assert len(values) == 3
@@ -189,7 +278,12 @@ class TestCatalog:
         assert catalog[['all']] == values
 
     def test_default(self, catalog: Catalog) -> None:
-        """Tests the `default` wildcard."""
+        """Tests the `default` wildcard.
+
+        Args:
+            catalog: `Catalog` with three items.
+
+        """
         assert catalog['default'] == catalog['all']
         catalog.default = 'tester'
         assert catalog['default'] is Something
@@ -198,7 +292,12 @@ class TestCatalog:
         assert catalog['Defaults'] == [Something, Another]
 
     def test_none(self, catalog: Catalog) -> None:
-        """Tests the `none` wildcard."""
+        """Tests the `none` wildcard.
+
+        Args:
+            catalog: `Catalog` with three items.
+
+        """
         assert catalog['none'] is None
         assert catalog['None'] is None
         catalog.always_return_list = True
@@ -210,20 +309,35 @@ class TestCatalog:
         assert catalog['none'] == []
 
     def test_list_of_keys(self, catalog: Catalog) -> None:
-        """Tests accessing a list of keys."""
+        """Tests accessing a list of keys.
+
+        Args:
+            catalog: `Catalog` with three items.
+
+        """
         assert catalog[['tester', 'another']] == [Something, Another]
         assert catalog[('tester',)] == [Something]
         assert catalog[['tester', 'missing']] == [Something]
 
     def test_always_return_list(self, catalog: Catalog) -> None:
-        """Tests `always_return_list`."""
+        """Tests `always_return_list`.
+
+        Args:
+            catalog: `Catalog` with three items.
+
+        """
         catalog.always_return_list = True
         assert catalog['tester'] == [Something]
         with pytest.raises(KeyError):
             catalog['missing']
 
     def test_setitem(self, catalog: Catalog) -> None:
-        """Tests `__setitem__` with a key and with a list of keys."""
+        """Tests `__setitem__` with a key and with a list of keys.
+
+        Args:
+            catalog: `Catalog` with three items.
+
+        """
         catalog['fourth'] = 4
         assert catalog['fourth'] == 4
         catalog[['fifth', 'sixth']] = [5, 6]
@@ -233,7 +347,12 @@ class TestCatalog:
             catalog[['a', 'b']] = [1]
 
     def test_add_and_get(self, catalog: Catalog) -> None:
-        """Tests `add` and `get`."""
+        """Tests `add` and `get`.
+
+        Args:
+            catalog: `Catalog` with three items.
+
+        """
         catalog.add({'new': 1})
         assert catalog['new'] == 1
         assert catalog.get('new') == 1
@@ -242,7 +361,12 @@ class TestCatalog:
         assert catalog.get('missing') == 'nothing'
 
     def test_delete(self, catalog: Catalog) -> None:
-        """Tests `delete` with one and several keys."""
+        """Tests `delete` with one and several keys.
+
+        Args:
+            catalog: `Catalog` with three items.
+
+        """
         catalog.delete('a_third')
         assert 'a_third' not in catalog
         del catalog[['tester', 'another']]
@@ -250,7 +374,12 @@ class TestCatalog:
         assert len(catalog) == 0
 
     def test_delete_missing(self, catalog: Catalog) -> None:
-        """Tests that `delete` raises and does not change anything."""
+        """Tests that `delete` raises and does not change anything.
+
+        Args:
+            catalog: `Catalog` with three items.
+
+        """
         with pytest.raises(KeyError, match = 'not found'):
             catalog.delete(['tester', 'missing'])
         assert len(catalog) == 3
@@ -266,7 +395,12 @@ class TestCatalog:
         assert contents == {'b': 2}
 
     def test_subset(self, catalog: Catalog) -> None:
-        """Tests `subset`."""
+        """Tests `subset`.
+
+        Args:
+            catalog: `Catalog` with three items.
+
+        """
         subset = catalog.subset(include = ['tester', 'another'])
         assert isinstance(subset, Catalog)
         assert subset.contents == {'tester': Something, 'another': Another}
@@ -274,13 +408,69 @@ class TestCatalog:
         assert isinstance(simple, dict)
         assert list(simple) == ['another', 'a_third']
 
+    def test_tuple_key(self, catalog: Catalog) -> None:
+        """Tests that a stored `tuple` key is used as a single key.
+
+        Args:
+            catalog: `Catalog` with three items.
+
+        """
+        catalog[('x', 'y')] = 'pair'
+        assert catalog[('x', 'y')] == 'pair'
+        assert catalog.get(('x', 'y')) == 'pair'
+        assert catalog[('tester', 'another')] == [Something, Another]
+        catalog.delete(('x', 'y'))
+        assert ('x', 'y') not in catalog.contents
+        assert len(catalog) == 3
+
+    def test_default_with_missing_key(self, catalog: Catalog) -> None:
+        """Tests that missing keys in `default` are skipped.
+
+        Args:
+            catalog: `Catalog` with three items.
+
+        """
+        catalog.default = ['tester', 'missing']
+        assert catalog['default'] == [Something]
+
+    def test_iteration(self, catalog: Catalog) -> None:
+        """Tests that iterating a `Catalog` returns its keys.
+
+        Args:
+            catalog: `Catalog` with three items.
+
+        """
+        assert list(catalog) == ['tester', 'another', 'a_third']
+        assert catalog.keys() == ('tester', 'another', 'a_third')
+
+    def test_contains_wildcards(self, catalog: Catalog) -> None:
+        """Tests that wildcards and key lists are not stored keys.
+
+        Args:
+            catalog: `Catalog` with three items.
+
+        """
+        assert 'all' not in catalog
+        assert 'none' not in catalog
+        assert 'default' not in catalog
+        assert ['tester'] not in catalog
+        assert catalog['all']
+        catalog['all'] = 'stored'
+        assert 'all' in catalog
+        assert len(catalog['all']) == 4
+
 
 class TestChainDict:
     """Tests for `ChainDict`."""
 
     @pytest.fixture
     def chain(self) -> ChainDict:
-        """Returns a `ChainDict` with two mappings that share a key."""
+        """Returns a `ChainDict` with two mappings that share a key.
+
+        Returns:
+            `ChainDict` with two mappings that share a key.
+
+        """
         return ChainDict(contents = [
             Dictionary({'a': 1, 'b': 2}),
             Dictionary({'a': 10, 'c': 30})])
@@ -294,7 +484,12 @@ class TestChainDict:
         assert list(chain) == []
 
     def test_maps(self, chain: ChainDict) -> None:
-        """Tests the `maps` property."""
+        """Tests the `maps` property.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
         assert chain.maps is chain.contents
         chain.maps = [Dictionary({'z': 1})]
         assert chain.contents == [Dictionary({'z': 1})]
@@ -310,7 +505,12 @@ class TestChainDict:
         assert len(chain.contents) == 1
 
     def test_getitem_return_first(self, chain: ChainDict) -> None:
-        """Tests `__getitem__` when returning only the first match."""
+        """Tests `__getitem__` when returning only the first match.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
         assert chain['a'] == 1
         assert chain['b'] == 2
         assert chain['c'] == 30
@@ -318,7 +518,12 @@ class TestChainDict:
             chain['missing']
 
     def test_getitem_all_matches(self, chain: ChainDict) -> None:
-        """Tests `__getitem__` when returning all matches."""
+        """Tests `__getitem__` when returning all matches.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
         chain.return_first = False
         assert chain['a'] == [1, 10]
         assert chain['b'] == 2
@@ -327,7 +532,12 @@ class TestChainDict:
             chain['missing']
 
     def test_setitem(self, chain: ChainDict) -> None:
-        """Tests `__setitem__`, including on an empty `ChainDict`."""
+        """Tests `__setitem__`, including on an empty `ChainDict`.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
         chain['z'] = 26
         assert chain.contents[0]['z'] == 26
         assert 'z' not in chain.contents[1]
@@ -337,13 +547,23 @@ class TestChainDict:
         assert empty['a'] == 1
 
     def test_keys_values_items(self, chain: ChainDict) -> None:
-        """Tests `keys`, `values` and `items`."""
+        """Tests `keys`, `values` and `items`.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
         assert chain.keys() == ('a', 'b', 'a', 'c')
         assert chain.values() == (1, 2, 10, 30)
         assert chain.items() == (('a', 1), ('b', 2), ('a', 10), ('c', 30))
 
     def test_mapping_interface(self, chain: ChainDict) -> None:
-        """Tests iteration and length use keys, as in any mapping."""
+        """Tests iteration and length use keys, as in any mapping.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
         assert list(chain) == ['a', 'b', 'a', 'c']
         assert len(chain) == 4
         assert 'c' in chain
@@ -351,7 +571,12 @@ class TestChainDict:
         assert dict(chain) == {'a': 1, 'b': 2, 'c': 30}
 
     def test_add(self, chain: ChainDict) -> None:
-        """Tests `add` with `Dictionary` instances and plain mappings."""
+        """Tests `add` with `Dictionary` instances and plain mappings.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
         chain.add(Dictionary({'x': 1}))
         chain.add({'y': 2})
         chain.add({'z': 3}, w = 4)
@@ -363,7 +588,12 @@ class TestChainDict:
         assert chain.contents[5].contents == {'v': 5, 'u': 6}
 
     def test_delete(self, chain: ChainDict) -> None:
-        """Tests `delete` removes a key from every stored mapping."""
+        """Tests `delete` removes a key from every stored mapping.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
         chain.delete('a')
         assert chain.keys() == ('b', 'c')
         del chain['b']
@@ -372,12 +602,17 @@ class TestChainDict:
             chain.delete('missing')
 
     def test_new_child_and_parents(self, chain: ChainDict) -> None:
-        """Tests `new_child` and `parents`."""
+        """Tests `new_child` and `parents`.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
         chain.default_factory = 'nothing'
         chain.return_first = False
         chain.new_child(Dictionary({'a': 0}))
         assert chain['a'] == [0, 1, 10]
-        parents = chain.parents()
+        parents = chain.parents
         assert isinstance(parents, ChainDict)
         assert len(parents.contents) == 2
         assert parents.default_factory == 'nothing'
@@ -385,7 +620,12 @@ class TestChainDict:
         assert len(chain.contents) == 3
 
     def test_subset(self, chain: ChainDict) -> None:
-        """Tests `subset`, including keys missing from some mappings."""
+        """Tests `subset`, including keys missing from some mappings.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
         subset = chain.subset(include = ['a', 'c'])
         assert isinstance(subset, ChainDict)
         assert subset.keys() == ('a', 'a', 'c')
@@ -400,7 +640,12 @@ class TestChainDict:
             chain.subset()
 
     def test_subset_returns(self, chain: ChainDict) -> None:
-        """Tests the `returns` argument of `subset`."""
+        """Tests the `returns` argument of `subset`.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
         chain.default_factory = 'nothing'
         copied = chain.subset(include = 'a', returns = 'copy')
         assert copied.default_factory == 'nothing'
@@ -409,11 +654,88 @@ class TestChainDict:
         assert simple[0] == Dictionary({'a': 1})
 
     def test_mutable_mapping_methods(self, chain: ChainDict) -> None:
-        """Tests methods inherited from `MutableMapping`."""
+        """Tests methods inherited from `MutableMapping`.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
         chain.update({'q': 5})
         assert chain.contents[0]['q'] == 5
         assert chain.pop('q') == 5
         assert 'q' not in chain
+
+    def test_new_child_defaults(self, chain: ChainDict) -> None:
+        """Tests `new_child` without a mapping and with a plain `dict`.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
+        chain.new_child()
+        assert chain.contents[0] == Dictionary()
+        assert chain['a'] == 1
+        chain.new_child({'a': 0})
+        assert isinstance(chain.contents[0], Dictionary)
+        assert chain['a'] == 0
+        assert chain.subset(include = 'a').values() == (0, 1, 10)
+
+    def test_get(self, chain: ChainDict) -> None:
+        """Tests `get` with and without defaults.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
+        assert chain.get('c') == 30
+        assert chain.get('missing', 'x') == 'x'
+        with pytest.raises(KeyError):
+            chain.get('missing')
+        chain.default_factory = 'nothing'
+        assert chain.get('missing') == 'nothing'
+
+    def test_fromkeys_default_value(self) -> None:
+        """Tests that `fromkeys` matches `dict.fromkeys` without a value."""
+        chain = ChainDict.fromkeys(['a'])
+        assert chain['a'] is None
+
+    def test_add_operators(self, chain: ChainDict) -> None:
+        """Tests `+` and `+=`.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
+        combined = chain + {'z': 1}
+        assert len(combined.contents) == 3
+        assert len(chain.contents) == 2
+        assert combined['z'] == 1
+        chain += {'z': 2}
+        assert chain['z'] == 2
+
+    def test_contains(self, chain: ChainDict) -> None:
+        """Tests that `in` checks every stored mapping.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
+        assert 'a' in chain
+        assert 'c' in chain
+        assert 'missing' not in chain
+        assert ['a'] not in chain
+        assert 'a' not in ChainDict()
+
+    def test_parents_is_property(self, chain: ChainDict) -> None:
+        """Tests that `parents` is a property, as in `collections.ChainMap`.
+
+        Args:
+            chain: `ChainDict` with two mappings that share a key.
+
+        """
+        assert isinstance(ChainDict.parents, property)
+        assert chain.parents.keys() == ('a', 'c')
+        assert chain.parents.parents.contents == []
 
 
 class TestRepository:
@@ -472,7 +794,18 @@ class TestRepository:
         """Tests that a subclass can change how names are inferred."""
 
         class Numbered(Repository):
+            """`Repository` that names items by their position."""
+
             def _get_name(self, item: object) -> str:
+                """Returns a name based on the number of stored items.
+
+                Args:
+                    item: ignored.
+
+                Returns:
+                    'item_' followed by the number of stored items.
+
+                """
                 return f'item_{len(self)}'
 
         repository = Numbered()
@@ -507,3 +840,25 @@ class TestRepository:
         assert isinstance(subset, Repository)
         assert subset.overwrite is True
         assert subset.keys() == ('another',)
+
+    def test_add_empty_string_key(self) -> None:
+        """Tests that an empty `str` key is used instead of inferred."""
+        repository = Repository()
+        repository.add(Another(), key = '')
+        assert repository.keys() == ('',)
+
+    def test_add_without_name_raises(self) -> None:
+        """Tests that `add` raises when no name can be inferred."""
+        settings.set_key_namer(lambda item: None)
+        repository = Repository()
+        with pytest.raises(ValueError, match = 'name could not be inferred'):
+            repository.add(Another())
+        repository.add(Another(), key = 'given')
+        assert repository.keys() == ('given',)
+
+    def test_add_unique_keys_ending_in_digits(self) -> None:
+        """Tests unique keys for names that already end in a digit."""
+        repository = Repository()
+        for _ in range(3):
+            repository.add(Another('v2'))
+        assert repository.keys() == ('v2', 'v22', 'v23')

@@ -2,9 +2,14 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
-from bunches import Dictionary, DictList, Listing, Repository, settings
+from bunches import DictList, Dictionary, Listing, Repository, settings
+
+if TYPE_CHECKING:
+    from bunches.kinds import SubsetReturns
 
 
 def test_defaults() -> None:
@@ -14,7 +19,6 @@ def test_defaults() -> None:
     assert 'none' in settings._NONE_KEYS
     assert settings._SUBSET_RETURN == 'class'
     assert settings._KEY_NAMER('Item') == 'Item'
-    assert settings._METHOD_NAMER('Item') == 'from_Item'
 
 
 def test_set_key_namer() -> None:
@@ -30,12 +34,16 @@ def test_set_key_namer() -> None:
         settings.set_key_namer('not callable')  # type: ignore[arg-type]
 
 
-def test_set_method_namer() -> None:
-    """Tests `set_method_namer`."""
-    settings.set_method_namer(lambda item: f'make_{item}')
-    assert settings._METHOD_NAMER('x') == 'make_x'
-    with pytest.raises(TypeError):
-        settings.set_method_namer(3)  # type: ignore[arg-type]
+@pytest.mark.parametrize('returns', ['class', 'copy', 'simple'])
+def test_set_subset_return_options(returns: SubsetReturns) -> None:
+    """Tests that `set_subset_return` accepts each option.
+
+    Args:
+        returns: option to set.
+
+    """
+    settings.set_subset_return(returns)
+    assert settings._SUBSET_RETURN == returns
 
 
 def test_set_subset_return() -> None:
@@ -48,3 +56,9 @@ def test_set_subset_return() -> None:
     with pytest.raises(ValueError, match = 'returns argument'):
         settings.set_subset_return('other')  # type: ignore[arg-type]
     assert settings._SUBSET_RETURN == 'copy'
+
+
+def test_method_namer_removed() -> None:
+    """Tests that the unused method namer was removed."""
+    assert not hasattr(settings, 'set_method_namer')
+    assert not hasattr(settings, '_METHOD_NAMER')

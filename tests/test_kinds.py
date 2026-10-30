@@ -16,11 +16,9 @@ def test_aliases() -> None:
     """Tests that type aliases exist."""
     assert kinds.GenericDict is not None
     assert kinds.GenericList is not None
-    assert kinds.GenericSet is not None
 
 
-def test_missing() -> None:
-    """Tests the missing value sentinel."""
-    assert isinstance(kinds._MISSING, kinds._MISSING_VALUE)
-    assert kinds._MISSING is not None
-    assert kinds._MISSING == kinds._MISSING_VALUE()
+def test_removed_members() -> None:
+    """Tests that unused members were removed."""
+    assert not hasattr(kinds, 'GenericSet')
+    assert not hasattr(kinds, '_MISSING')

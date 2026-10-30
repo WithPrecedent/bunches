@@ -2,12 +2,22 @@
 
 from __future__ import annotations
 
+import copy
 import dataclasses
 from typing import Any
 
 import pytest
 
-from bunches import Bunch, Dictionary, Listing, settings
+from bunches import (
+    Bunch,
+    Catalog,
+    ChainDict,
+    DictList,
+    Dictionary,
+    Listing,
+    Repository,
+    settings,
+)
 
 
 @dataclasses.dataclass
@@ -17,20 +27,51 @@ class MinimalBunch(Bunch):
     contents: list[Any] = dataclasses.field(default_factory = list)
 
     def add(self, item: Any) -> None:
-        """Appends `item`."""
+        """Appends `item`.
+
+        Args:
+            item: item to append to `contents`.
+
+        """
         self.contents.append(item)
 
     def delete(self, item: int) -> None:
-        """Deletes the item at index `item`."""
+        """Deletes the item at index `item`.
+
+        Args:
+            item: index of the item to delete.
+
+        """
         del self.contents[item]
 
-    def subset(self, include: Any = None, exclude: Any = None,
-               returns: Any = None) -> Any:
-        """Returns a new instance with `include` items."""
+    def subset(
+            self,
+            include: Any = None,
+            exclude: Any = None,
+            returns: Any = None) -> Any:
+        """Returns a new instance with `include` items.
+
+        Args:
+            include: items to include.
+            exclude: ignored.
+            returns: ignored.
+
+        Returns:
+            A new instance with the items in `include`.
+
+        """
         return self.__class__([i for i in self.contents if i in include])
 
     def __contains__(self, item: object) -> bool:
-        """Returns if `item` is in `contents`."""
+        """Returns if `item` is in `contents`.
+
+        Args:
+            item: item to look for.
+
+        Returns:
+            Whether `item` is in `contents`.
+
+        """
         return item in self.contents
 
 
@@ -41,15 +82,36 @@ def test_bunch_is_abstract() -> None:
 
     @dataclasses.dataclass
     class NoSubset(Bunch):
+        """`Bunch` without the required `subset` method."""
+
         contents: list[Any] = dataclasses.field(default_factory = list)
 
         def add(self, item: Any) -> None:
-            pass
+            """Does nothing.
+
+            Args:
+                item: ignored.
+
+            """
 
         def delete(self, item: Any) -> None:
-            pass
+            """Does nothing.
+
+            Args:
+                item: ignored.
+
+            """
 
         def __contains__(self, item: object) -> bool:
+            """Returns `False`.
+
+            Args:
+                item: ignored.
+
+            Returns:
+                `False`.
+
+            """
             return False
 
     with pytest.raises(TypeError):
@@ -99,3 +161,29 @@ def test_concrete_subclasses_are_bunches() -> None:
     """Tests that package classes are `Bunch` instances."""
     assert isinstance(Dictionary(), Bunch)
     assert isinstance(Listing(), Bunch)
+
+
+@pytest.mark.parametrize(('instance', 'other'), [
+    (Dictionary({'a': [1]}), {'b': [2]}),
+    (Catalog({'a': [1]}), {'b': [2]}),
+    (ChainDict([Dictionary({'a': [1]})]), {'b': [2]}),
+    (Repository({'a': [1]}), [2]),
+    (Listing([[1]]), [[2]]),
+    (DictList(['a']), ['b'])])
+def test_add_operators_all_classes(instance: Bunch, other: Any) -> None:
+    """Tests that `+` copies and `+=` modifies in place for every class.
+
+    Args:
+        instance: instance of a `bunches` class.
+        other: item to add to `instance`.
+
+    """
+    original = copy.deepcopy(instance)
+    combined = instance + other
+    assert type(combined) is type(instance)
+    assert instance == original
+    assert combined != original
+    same = instance
+    instance += other
+    assert instance is same
+    assert instance == combined

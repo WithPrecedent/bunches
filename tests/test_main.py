@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.resources
 import pathlib
 import re
 
@@ -29,3 +30,9 @@ def test_python_requirement() -> None:
     text = path.read_text(encoding = 'utf-8')
     assert 'requires-python = ">=3.11"' in text
     assert 'Python :: 3.10' not in text
+
+
+def test_py_typed() -> None:
+    """Tests that the package includes the `py.typed` marker."""
+    marker = importlib.resources.files('bunches').joinpath('py.typed')
+    assert marker.is_file()

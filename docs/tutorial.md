@@ -64,7 +64,7 @@ settings.return_first = False
 settings['debug']          # [True, False]
 ```
 
-Use `new_child` to put a new dictionary in front and `parents()` to get a `ChainDict` without the first dictionary.
+Use `new_child` to put a new dictionary in front and the `parents` property to get a `ChainDict` without the first dictionary.
 
 ## `Repository`
 

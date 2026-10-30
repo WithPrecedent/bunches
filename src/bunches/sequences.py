@@ -40,12 +40,12 @@ class Listing(base.Bunch, MutableSequence):
 
     """
 
-    contents: GenericList = dataclasses.field(default_factory=list)
+    contents: GenericList = dataclasses.field(default_factory = list)
 
-    """ Instance Methods """
+    """ Public Methods """
 
     def add(self, item: Any | GenericList) -> None:
-        """Extends `contents` with `item` if it is a sequence. Otherwise appends.
+        """Extends `contents` with `item` if it is a sequence or appends it.
 
         The method will extend all passed sequences, except `str` and `bytes`
         types, which it will append.
@@ -54,7 +54,7 @@ class Listing(base.Bunch, MutableSequence):
             item: item(s) to add to `contents`.
 
         """
-        if utilities._is_sequence(item=item):
+        if utilities._is_sequence(item = item):
             self.contents.extend(item)
         else:
             self.contents.append(item)
@@ -91,22 +91,23 @@ class Listing(base.Bunch, MutableSequence):
             item: item(s) to prepend to `contents`.
 
         """
-        if utilities._is_sequence(item=item):
+        if utilities._is_sequence(item = item):
             self.contents[:0] = list(item)
         else:
             self.insert(0, item)
 
     def subset(
-        self,
-        include: Any | GenericList | None = None,
-        exclude: Any | GenericList | None = None,
-        returns: SubsetReturns | None = None,
-    ) -> Any:
+            self,
+            include: Any | GenericList | None = None,
+            exclude: Any | GenericList | None = None,
+            returns: SubsetReturns | None = None) -> Any:
         """Returns a new instance with a subset of `contents`.
 
         This method applies `include` before `exclude` if both are passed. If
         `include` is None, all existing items will be added to the new subset
-        class instance before `exclude` is applied.
+        class instance before `exclude` is applied. Items are compared with
+        `include` and `exclude` by the `_is_match` method. The items in the
+        subset are deep copies, so changing them does not change this instance.
 
         Args:
             include: item(s) to include in the new instance. Defaults to `None`.
@@ -116,28 +117,42 @@ class Listing(base.Bunch, MutableSequence):
                 simple native Python type ("simple"). Defaults to `None`, which
                 uses the global setting stored in `settings._SUBSET_RETURN`.
 
-        Raises:
-            ValueError: if `include` and `exclude` are both None.
-
         Returns:
             Instance with only items from `include` and no items in `exclude`,
                 in the form dictated by the `returns` argument.
+
+        Raises:
+            ValueError: if `include` and `exclude` are both None.
 
         """
         if include is None and exclude is None:
             raise ValueError('include or exclude must not be None')
         returns = self._resolve_returns(returns)
-        if include is None:
-            contents = copy.deepcopy(self.contents)
-        else:
-            include = list(utilities._iterify(include))
-            contents = [i for i in self.contents if i in include]
+        contents = list(self.contents)
+        if include is not None:
+            included = list(utilities._iterify(include))
+            contents = [i for i in contents if self._is_match(i, included)]
         if exclude is not None:
-            exclude = list(utilities._iterify(exclude))
-            contents = [i for i in contents if i not in exclude]
+            excluded = list(utilities._iterify(exclude))
+            contents = [i for i in contents if not self._is_match(i, excluded)]
+        contents = copy.deepcopy(contents)
         return utilities._return_subset(
-            subset=contents, existing=self, returns=returns
-        )
+            subset = contents, existing = self, returns = returns)
+
+    """ Private Methods """
+
+    def _is_match(self, item: Any, matches: GenericList) -> bool:
+        """Returns whether `item` is in `matches`.
+
+        Args:
+            item: stored item to test.
+            matches: items passed to `include` or `exclude` in `subset`.
+
+        Returns:
+            Whether `item` is in `matches`.
+
+        """
+        return item in matches
 
     """ Dunder Methods """
 
@@ -168,11 +183,12 @@ class Listing(base.Bunch, MutableSequence):
 class DictList(Listing):
     """Iterable that has both a dict and list interfaces.
 
-    DictList combines the functionality and interfaces of python dicts and lists.
-    It allows duplicate keys and list-like iteration while supporting the easier
-    access methods of dictionaries. In order to support this hybrid approach to
-    iterables, DictList can only store items that are hashable or have a `name`
-    attribute or property that contains or returns a hashable value.
+    DictList combines the functionality and interfaces of python dicts and
+    lists. It allows duplicate keys and list-like iteration while supporting the
+    easier access methods of dictionaries. In order to support this hybrid
+    approach to iterables, DictList can only store items that are hashable or
+    have a `name` attribute or property that contains or returns a hashable
+    value.
 
     A DictList inherits the differences between a Listing and an ordinary python
     list.
@@ -180,24 +196,25 @@ class DictList(Listing):
     A DictList differs from a Listing in 4 significant ways:
         1) It only stores hashable items or objects for which a str name can be
             derived (using the global key namer in `settings._KEY_NAMER`).
-        2) DictList has an interface of both a dict and a list, but stores a list.
-            DictList does this by taking advantage of the `name` attribute or
-            hashability of stored items. A `name` or hash acts as a key to
-            create the facade of a dict with the items in the stored list
-            serving as values. This allows for duplicate keys for storing items,
-            simpler iteration than a dict, and support for returning multiple
-            matching items. This design comes at the expense of lookup speed. As
-            a result, DictList should only be used if a high volume of access
-            calls is not anticipated. Ordinarily, the loss of lookup speed
-            should have negligible effect on overall performance.
+        2) DictList has an interface of both a dict and a list, but stores a
+            list. DictList does this by taking advantage of the `name`
+            attribute or hashability of stored items. A `name` or hash acts as
+            a key to create the facade of a dict with the items in the stored
+            list serving as values. This allows for duplicate keys for storing
+            items, simpler iteration than a dict, and support for returning
+            multiple matching items. This design comes at the expense of lookup
+            speed. As a result, DictList should only be used if a high volume
+            of access calls is not anticipated. Ordinarily, the loss of lookup
+            speed should have negligible effect on overall performance.
         3) DictLists should not store int types. This ensures that when, for
-            example, a `dictlist_instance[3]` is called, the item at that index is
-            returned. If int types are stored, that call would create
+            example, a `dictlist_instance[3]` is called, the item at that index
+            is returned. If int types are stored, that call would create
             uncertainty as to whether an index or item should be returned. By
             design, int types are assumed to be calls to return the item at that
             index.
         4) When using dict access methods, a `DictList` of matches may be
             returned because a DictList allows duplicate pseudo-keys to be used.
+            `subset` also selects items by name.
 
     Args:
         contents: items to store that are hashable or have a `name` attribute.
@@ -208,11 +225,10 @@ class DictList(Listing):
     """
 
     contents: MutableSequence[Hashable] = dataclasses.field(
-        default_factory=list
-    )
+        default_factory = list)
     default_factory: Any | None = None
 
-    """ Instance Methods """
+    """ Public Methods """
 
     def delete(self, item: Any | int | slice) -> None:
         """Deletes item in `contents`.
@@ -245,13 +261,13 @@ class DictList(Listing):
             default: default value to return if `key` is not found in
                 `contents`.
 
-        Raises:
-            KeyError: if `key` is not in the DictList and `default` and the
-                `default_factory` attribute are both None.
-
         Returns:
             Value matching key in `contents`, `default`, or the
                 `default_factory` value (called if it is callable).
+
+        Raises:
+            KeyError: if `key` is not in the DictList and `default` and the
+                `default_factory` attribute are both None.
 
         """
         try:
@@ -274,7 +290,7 @@ class DictList(Listing):
                 eliminate any duplicate keys, which are permitted by DictList.
 
         """
-        return tuple(zip(self.keys(), self.values(), strict=True))
+        return tuple(zip(self.keys(), self.values(), strict = True))
 
     def keys(self) -> tuple[Hashable, ...]:
         """Emulates python dict `keys` method.
@@ -322,6 +338,25 @@ class DictList(Listing):
         """
         return tuple(self.contents)
 
+    """ Private Methods """
+
+    def _is_match(self, item: Any, matches: GenericList) -> bool:
+        """Returns whether the name of `item` is in `matches`.
+
+        This makes `subset` select items by name, as `__getitem__`, `get` and
+        `delete` do. The name is found with the global key namer stored in
+        `settings._KEY_NAMER`.
+
+        Args:
+            item: stored item to test.
+            matches: names passed to `include` or `exclude` in `subset`.
+
+        Returns:
+            Whether the name of `item` is in `matches`.
+
+        """
+        return settings._KEY_NAMER(item) in matches
+
     """ Dunder Methods """
 
     def __getitem__(self, key: Hashable | int | slice) -> Any:
@@ -340,14 +375,14 @@ class DictList(Listing):
         Args:
             key: name of an item or index to search for in `contents`.
 
-        Raises:
-            KeyError: if `key` is not an int or slice and no item matches it.
-            IndexError: if `key` is an int outside of the range of `contents`.
-
         Returns:
             Value(s) stored in `contents` that correspond to `key`. If there is
                 more than one match, the return is a DictList or DictList
                 subclass with the matching stored items.
+
+        Raises:
+            KeyError: if `key` is not an int or slice and no item matches it.
+            IndexError: if `key` is an int outside of the range of `contents`.
 
         """
         if isinstance(key, int | slice):
@@ -359,8 +394,7 @@ class DictList(Listing):
         if len(matches) == 1:
             return matches[0]
         return self.__class__(
-            contents=matches, default_factory=self.default_factory
-        )
+            contents = matches, default_factory = self.default_factory)
 
     def __setitem__(self, key: Any | int | slice, value: Any) -> None:
         """Sets `key` in `contents` to `value`.

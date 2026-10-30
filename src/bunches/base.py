@@ -11,7 +11,7 @@ from __future__ import annotations
 import abc
 import copy
 import dataclasses
-from collections.abc import Collection, Hashable, Iterator
+from collections.abc import Collection, Iterator
 from typing import TYPE_CHECKING, Any, Self
 
 from . import settings
@@ -51,7 +51,7 @@ class Bunch(Collection, abc.ABC):
 
     contents: Collection[Any]
 
-    """ Required Subclass Methods """
+    """ Required Methods """
 
     @abc.abstractmethod
     def add(self, item: Any, *args: Any, **kwargs: Any) -> None:
@@ -81,11 +81,10 @@ class Bunch(Collection, abc.ABC):
 
     @abc.abstractmethod
     def subset(
-        self,
-        include: Collection[Any] | Any | None = None,
-        exclude: Collection[Any] | Any | None = None,
-        returns: SubsetReturns | None = None,
-    ) -> Any:
+            self,
+            include: Collection[Any] | Any | None = None,
+            exclude: Collection[Any] | Any | None = None,
+            returns: SubsetReturns | None = None) -> Any:
         """Returns a new instance with a subset of `contents`.
 
         This method applies `include` before `exclude` if both are passed. If
@@ -119,7 +118,7 @@ class Bunch(Collection, abc.ABC):
 
         """
         new_instance = copy.deepcopy(self)
-        new_instance.add(item=other)
+        new_instance.add(item = other)
         return new_instance
 
     def __iadd__(self, other: Any) -> Self:
@@ -132,10 +131,10 @@ class Bunch(Collection, abc.ABC):
             The instance, modified in place.
 
         """
-        self.add(item=other)
+        self.add(item = other)
         return self
 
-    def __delitem__(self, item: Hashable) -> None:
+    def __delitem__(self, item: Any) -> None:
         """Deletes `item` from `contents`.
 
         Args:
@@ -145,7 +144,7 @@ class Bunch(Collection, abc.ABC):
             KeyError: if `item` is not in `contents`.
 
         """
-        self.delete(item=item)
+        self.delete(item = item)
 
     def __iter__(self) -> Iterator[Any]:
         """Returns iterator of `contents`.
