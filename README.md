@@ -198,12 +198,6 @@ Contributors are always welcome. Feel free to grab an [issue](https://www.github
 * [`collections`](https://docs.python.org/3/library/collections.html) in the Python standard library provides `UserDict`, `UserList`, `ChainMap` and `defaultdict`, which inspired several of the classes in `bunches`.
 * [`sortedcontainers`](https://grantjenks.com/docs/sortedcontainers/) provides sorted drop-in replacements for `list`, `dict` and `set`.
 
-## Acknowledgments
-
-I'd also like to extend a special thanks to [pawamoy](https://github.com/pawamoy) whose excellent `mkdocs` extensions and utilities are incorporated into `snickerdoodle`. Some of the scripts, documentation, configuration files, and other CI code were adapted from pawamoy's repositories.
-
-I would also like to thank the University of Kansas School of Law for tolerating and supporting this law professor's coding efforts, an endeavor which is well outside the typical scholarly activities in the discipline.
-
 ## License
 
 Use of this repository is authorized under the [Apache Software License 2.0](https://www.github.com/WithPrecedent/bunches/blob/main/LICENSE).
